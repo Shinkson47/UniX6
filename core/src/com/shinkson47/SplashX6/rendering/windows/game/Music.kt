@@ -12,9 +12,7 @@ import com.shinkson47.SplashX6.utility.Assets
  */
 class Music : StageWindow("Music") {
 
-    override fun constructContent() {
-        if (FIRST_CONSTRUCTION) return
-
+    init {
         span(add(
                 Label("You can also control spotify!", Assets.SKIN)
         ).fillX().center())
@@ -24,7 +22,7 @@ class Music : StageWindow("Music") {
         addButton("pauseSong", false){  AudioController.pauseMusic() }.pack()
         tooltip("ttPause")
 
-        addButton("resumeSong") { AudioController.resumeMusic() }
+        addButton("generic.sound.resume") { AudioController.resumeMusic() }
         tooltip("ttResume")
 
         hsep()
@@ -37,12 +35,8 @@ class Music : StageWindow("Music") {
 
         row()
 
-        addButton("resetPlaylist") { AudioController.resetPlaylist() }
+        addButton("specific.windows.music.resetPlaylist") { AudioController.resetPlaylist() }
         tooltip("ttReset")
         updateColSpans()
-    }
-
-    init {
-        constructContent()
     }
 }
