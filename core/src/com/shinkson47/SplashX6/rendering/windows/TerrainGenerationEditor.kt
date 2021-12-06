@@ -5,7 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameData.world
 import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.game.world.FastNoiseLite
 import com.shinkson47.SplashX6.game.world.generation.GenerationCompanion
@@ -20,7 +19,7 @@ import com.shinkson47.SplashX6.utility.Utility
  * @since v1
  * @version 1
  */
-class TerrainGenerationEditor : Window("Terrain Generation Editor", SKIN_KENNEY) {
+class TerrainGenerationEditor : StageWindow("Terrain Generation Editor") {
 
     val buildButton = TextButton("Regenerate", SKIN_KENNEY)
     val autoRebuild = CheckBox("Auto re-build", SKIN_KENNEY)
@@ -116,14 +115,14 @@ class TerrainGenerationEditor : Window("Terrain Generation Editor", SKIN_KENNEY)
     }
 
     private fun build () {
-        val x = world
+        val x = GameData.world
         try {
             Generator.fastBuild = fastBuild.isChecked
             GameData.new()
-            GameHypervisor.gameRenderer!!.r = IsometricStaggeredTiledMapRenderer(world)
+            GameHypervisor.gameRenderer!!.r = IsometricStaggeredTiledMapRenderer(GameData.world)
             buildButton.setText("Done!")
         } catch ( e : Exception ) {
-            world = x
+            GameData.world = x
             buildButton.setText("Build Failed!")
         }
     }

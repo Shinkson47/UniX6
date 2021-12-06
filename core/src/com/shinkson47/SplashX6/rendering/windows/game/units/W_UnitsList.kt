@@ -3,8 +3,6 @@ package com.shinkson47.SplashX6.rendering.windows.game.units
 import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.shinkson47.SplashX6.game.GameData
 import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.camera_focusOn
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.unit_selected
 import com.shinkson47.SplashX6.game.units.Unit
 import com.shinkson47.SplashX6.rendering.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.GameWindowManager
@@ -32,16 +30,10 @@ class W_UnitsList : StageWindow("Units"){
         }
 
         if (it.tapCount >= 2)
-            GameWindowManager.postWindow(W_Unit(selected))
+            StageWindow.post(W_Unit(selected))
     }})
 
-    init { constructContent() }
-
-    /**
-     * <h2>Constructs the content to be displayed in this window</h2>
-     */
-    override fun constructContent() {
-        if (FIRST_CONSTRUCTION) return
+   init {
         list.selection.required = false
 
         list.addListener(SELECT_LISTENER(list))
@@ -50,13 +42,12 @@ class W_UnitsList : StageWindow("Units"){
         // TODO localise
         // TODO lots of repeating code here
 
-
         refresh()
-        pack()
     }
 
     override fun refresh() {
         list.setItems(*GameData.player!!.units.toTypedArray())
+        pack()
     }
 
     //#endregion

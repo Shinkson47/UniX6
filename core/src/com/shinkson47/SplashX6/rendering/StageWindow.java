@@ -1,7 +1,5 @@
 package com.shinkson47.SplashX6.rendering;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -14,24 +12,37 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.shinkson47.SplashX6.Client;
 import com.shinkson47.SplashX6.audio.AudioController;
-import com.shinkson47.SplashX6.utility.Assets;
+import com.shinkson47.SplashX6.game.GameHypervisor;
+import com.shinkson47.SplashX6.utility.Utility;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
 import static com.shinkson47.SplashX6.audio.AudioController.GUI_SOUND;
+import static com.shinkson47.SplashX6.utility.Assets.SKIN;
 import static com.shinkson47.SplashX6.utility.Utility.local;
 
 /**
- * <h1>A LibGDX Window with some extended functionality </h1>
- *
+ * <h1>Splash X6's in-game GUI window.</h1>
+ * <br/><br/>
+ * Splash uses Stage 2d with utilities to make window
+ * creation and management easier.
+ * <br/><br/>
+ * Windows are added to the game screen automatically when created. <br/>
+ * see StageWindow#post(StageWindow)
+ * <br/><br/>
+ * TODO When entering from the main menu, loads of windows are posted.
+ * <br/>
+ * TODO no concideration for posting on screens other than the game screen.
  * @author <a href="https://www.shinkson47.in">Jordan T. Gray on 22/04/2021</a>
- * @version 1
+ * @version 2
  * @since v1
  */
-public abstract class StageWindow extends Window {
+public abstract class StageWindow extends Window implements Runnable {
 
     //=====================================================================
-    //#region fields
+    //#region Companion
     //=====================================================================
 
     /**
@@ -47,10 +58,8 @@ public abstract class StageWindow extends Window {
      */
     public static final Drawable lightBG;
 
-
-
     static {
-        seperatorStyle = new Label.LabelStyle(new Label("", Assets.SKIN).getStyle());
+        seperatorStyle = new Label.LabelStyle(new Label("", SKIN).getStyle());
         Pixmap labelColor = new Pixmap(200, 200, Pixmap.Format.RGB888);
         labelColor.setColor(Client.hr, Client.hg, Client.b, Client.a);
         labelColor.fill();
@@ -58,232 +67,227 @@ public abstract class StageWindow extends Window {
         seperatorStyle.background = lightBG;
     }
 
+    //=====================================================================
+    //#endregion Companion
+    //#region Game Window Management
+    //=====================================================================
+
     /**
-     * Cells in this window that should span the entire window's width
-     * (all columns)
+     * # All windows that have been posted to the game screen.
+     * @see StageWindow#post(StageWindow)
+     */
+    private static ArrayList<StageWindow> GAME_WINDOWS = new ArrayList();
+
+    /**
+     * A select box shown on the game screen containing all game windows.
+     */
+    private static final SelectBox<StageWindow> WINDOW_DOCK = new SelectBox(SKIN);
+    static {
+        WINDOW_DOCK.setPosition(0f, 0f);
+        WINDOW_DOCK.addListener(new StageWindow.LambdaChangeListener(o -> {
+            WINDOW_DOCK.getSelected().setVisible(true);
+            WINDOW_DOCK.toFront();
+        }));
+    }
+
+    public static ArrayList<StageWindow> getGameWindows() {return GAME_WINDOWS;}
+    public static SelectBox<StageWindow> getWINDOW_DOCK() {return WINDOW_DOCK;}
+
+    /**
+     * Registers a window for management, and displays it
+     * in the game.
+     *
+     * Is not in-game, has no effect.
+     *
+     * Windows must be added to the screen manually for now.
+     */
+    public static void post(StageWindow sw) {
+        if (!GameHypervisor.getInGame()) return;
+        Stage s = GameHypervisor.getGameRenderer().getHUDStage();
+        s.addActor(sw);
+
+        // IMPLEMENT a way for the user to configure where windows are created.
+        sw.setPosition(s.getWidth() * 0.5f, s.getHeight() * 0.5f, Align.center);
+
+        dock(sw);
+
+        WINDOW_DOCK.setItems(GAME_WINDOWS.toArray(new StageWindow[0]));
+        WINDOW_DOCK.pack();
+    }
+
+    /**
+     * Removes a window from management, and from the game screen.
+     *
+     * Called by 'clear', which actually decomposes the window.
+     * This does not modify the window.
+     */
+    public static void unPost(StageWindow sw) {
+        sw.getStage().getActors().removeValue(sw, true);
+        unDock(sw);
+    }
+
+    /**
+     * Calls 'clear' on all posted windows, decomposing them
+     * and unPosting them.
+     */
+    public static void unPostAll() {
+        for (StageWindow sw : WINDOW_DOCK.getItems()) {
+            WINDOW_DOCK.getItems().removeValue(sw, true);
+            sw.clear();
+        }
+    }
+
+    /**
+     * Adds a window to the list of posted windows,
+     * but does not post it to a stage.
+     * @deprecated The dock should not normally be manipulated.
+     */
+    @Deprecated
+    public static void dock(StageWindow sw) {
+        GAME_WINDOWS.add(sw);
+    }
+
+    /**
+     * Removes a window from the list of posted windows,
+     * but does not modify.it
+     * @deprecated The dock should not normally be manipulated.
+     */
+    @Deprecated
+    public static void unDock(StageWindow sw) {
+        GAME_WINDOWS.remove(sw);
+    }
+
+    //=====================================================================
+    //#endregion Game Window Management
+    //#region fields
+    //=====================================================================
+
+    /**
+     * Cells in this window that should span the entire all columns
      */
     private final ArrayList<Cell> spannedCells = new ArrayList<>();
+
     /**
-     * # State var, implementations can use to ignore first [constructContent]
-     * Since [constructContent] occours in the super constructor, forward references
-     * are possible and annoying.
-     * <p>
-     * Instead, you can have the [constructContent] ignore the super, and invoke it yourself.
-     * <p>
-     * ```
-     * public someWindow() {
-     * super();
-     * constructContent();
-     * }
+     * The name of this window, placed into the top
+     * of the window and used to reffer to it.
+     */
+    private String title;
+    public String getTitle() { return title; }
+
+    /**
+     * When true, clicking the close button does not close the window
+     * but just hides it.
      *
-     * @Override protected constructContent() {
-     * if (FIRST_CONSTRUCTION) return;
-     * ...
-     * }
-     * ```
+     * True by default, to match the functionality of the in-game
+     * menu bar window management which toggles visibility.
+     * We don't want to actually destroy and close the window,
+     * just hide it.
      */
-    // TODO kotlin style docs
-    protected boolean FIRST_CONSTRUCTION = true;
-    /**
-     * Last known number of columns in this window
-     */
-    private int lastSpan = 1000;
-
-    public String title;
-
     private boolean dontClose = true;
-
 
     //=====================================================================
     //#endregion fields
     //#region constructors
     //=====================================================================
 
-
     public StageWindow() {
         this("");
     }
-
-    public StageWindow(String title) {
-        this(title, "");
+    public StageWindow(String key) {
+        this(key, "");
     }
-
-    public StageWindow(String title, String style) {
-        this(title, style, true);
+    public StageWindow(String key, String style) {
+        this(key, style, true);
     }
-
-    public StageWindow(String title, Boolean visible) {
-        this(title, "", visible);
+    public StageWindow(String key, Boolean visible) {
+        this(key, "", visible);
     }
-
-    public StageWindow(String title, String style, Boolean visible) {
-        this(title, style, visible, true);
+    public StageWindow(String key, String style, Boolean visible) {
+        this(key, style, visible, true);
     }
-
-    public StageWindow(String title, String style, Boolean visible, Boolean resizable) {
-        super("", Assets.SKIN);
-        this.title = title;
-        if (!style.equals("")) setStyle(Assets.SKIN.get(style, WindowStyle.class));
-
+    public StageWindow(String key, String style, Boolean visible, Boolean resizable) {
+        super("", SKIN);
+        this.title = key;
+        if (!style.equals("")) setStyle(SKIN.get(style, WindowStyle.class));
 
         center();
-
-        placeTitle(style, title);
-
-        constructContent();
-
-        pack();
-        setPosition(Gdx.graphics.getWidth() / 2 - this.getWidth() / 2, Gdx.graphics.getHeight() / 2 - this.getHeight() / 2);
-
+        placeTitle(style, key);
         setResizable(resizable);
         setVisible(visible);
-        FIRST_CONSTRUCTION = false;
+        updateColSpans();
+        GameHypervisor.turn_hook(this);
+        post(this); // TODO no consideration for posting on other stages on creation. We might not want a window on the game screen.
     }
-
 
     //=====================================================================
     //#endregion constructors
     //#region api extention
     //=====================================================================
 
-    // TODO change all strings to keys fetches
-
-    public static void dialog(Actor actor, String title, String text, String positive, String negative, Consumer<Boolean> resultHandler) {
-        if (actor.getStage() == null)
-            throw new NullPointerException("Tried to show a dialog, but the caller was not on a stage.");
-
-        // Construct dialog, that gives the result to the handler
-        Dialog dialog = new Dialog("", Assets.SKIN, "dialog-modal") {
-            protected void result(Object object) {
-                if (resultHandler != null)
-                    resultHandler.accept((boolean) object);
-            }
-        };
-
-        // Clear the canvas to create a custom title
-        //        dialog.getTitleTable().reset();
-
-        // TODO use util for title
-        // Format and add title.
-        //        Label lblTitle = new Label(title, Assets.SKIN, "title");
-        //        lblTitle.setAlignment(Align.bottom);
-        //        dialog.getTitleTable().add(lblTitle).expand();
-        placeTitle(dialog, "dialog-modal", title);
-
-        // Format and add content.
-        dialog.getContentTable().padTop(30).padBottom(30);
-        dialog.text(text);
-
-        // If text is provided, add corresponding buttons and handler.
-
-        if (!positive.equals(""))
-            dialog.button(positive, true);
-            // TODO Localise
-        else dialog.button("OK!");
-
-        if (!negative.equals(""))
-            dialog.button(negative, false);
-
-        dialog.show(actor.getStage());
-    }
-
     /**
      * <h2>Places a label on the provided window to act as the window title.</h2>
      *
      * @param windowStyle The style of the window, determines the placement and style of heading used.
-     * @param title       The title text
+     * @param key       The title text
      */
-    protected static void placeTitle(Window w, String windowStyle, String title) {
-        placeTitle(w, windowStyle, title, true);
-    }
+    protected void placeTitle(String windowStyle, String key) { placeTitle(this, windowStyle, key); }
+    protected static void placeTitle(Window w, String windowStyle, String key) { placeTitle(w, windowStyle, key, true); }
+    protected static void placeTitle(Window w, String windowStyle, String key, Boolean close) {
+        w.padTop(30f);
+        if (key.equals("")) return;   // If there's no title, do nothing
 
-    protected static void placeTitle(Window w, String windowStyle, String title, Boolean close) {
-        // If there's no title, do nothing
-        if (title.equals("")) return;
-
-        // Start from fresh
-        w.getTitleTable().reset();
+        w.getTitleTable().reset();      // Start from fresh
 
         Label label;
 
         // If using a dialog
         if (windowStyle.equals("dialog") || windowStyle.equals("dialog-modal")) {
             // Use plain upper, with 'title' style class (which wraps in '[]' and opaque bg to cover window border.)
-            label = new Label(title.toUpperCase(), Assets.SKIN, "title");
+            label = new Label(local(key).toUpperCase(), SKIN, "title");
         } else {
-            label = new Label(title.toUpperCase(), Assets.SKIN);
-
-            // TODO this text needs to be white.
-            // Add the label
+            label = new Label(local(key).toUpperCase(), SKIN); // TODO this text needs to be white. Not sure why it isn't atm.
             w.getTitleTable().add(label).expandX();
 
-            // Add a close button at top
-            if (close)
-            w.getTitleTable()
-                    .add(button("close", o -> {
-                        if (w instanceof StageWindow && ((StageWindow)w).dontClose)
-                            ((StageWindow)w).toggleShown();
-                            else {
-                                w.clear();
-                                w.getStage().getActors().removeValue(w, true);
-                            }
-                    }))
-                    .right()
-                    .row();
+            // IMPLEMENT a way for the user to configure which side the buttons are placed on.
+            // FIXME the buttons don't match the forehead size
+            // Buttons
+            w.getTitleTable().add(button("meta.pseudographic.pack", o -> {w.pack();}));
 
+            if (close)
+                w.getTitleTable()
+                        .add(button("meta.pseudographic.close", o -> {
+                            if (w instanceof StageWindow && ((StageWindow)w).dontClose)
+                                ((StageWindow)w).toggleShown();
+                            else
+                                w.clear();
+                        }))
+                        .right();
+
+            w.getTitleTable().row();
             w.getTitleTable().align(Align.right);
         }
-
-
-
-        // Add a gap between the title and the first row of content in the window.
-        w.row().padTop(
-                w.getTitleTable().getPadTop() + w.getTitleLabel().getHeight()
-        );
-
-        w.padTop(30f);
     }
 
     /**
-     * <h2>Creates a button with a listener</h2>
-     *
-     * @param key key of local text to put in button
-     * @param e    Function of the button
-     * @return the button created
+     * Creates a localized label.
      */
-    public static TextButton button(String key, Consumer<?> e) {
-        TextButton b = new TextButton(local(key), Assets.SKIN);
-        onClick(b, e);
-        return b;
-    }
-
     protected Cell<Label> label(String key){
         return label(key, this);
     }
-
-    public static Cell<Label> label(String key, Table t){
-        return label(key, t, "default");
-    }
-
+    public static Cell<Label> label(String key, Table t){ return label(key, t, "default"); }
     public static Cell<Label> label(String key, Table t, String style){
-        Label l = new Label(local(key), Assets.SKIN, style);
-
-        return t.add(l).padTop(20f);
+        return t.add(new Label(local(key), SKIN, style)).padTop(20f);
     }
 
     /**
-     * DEVELOPMENT
-     *
-     * add javaadoc if this method stays
-     * @param key
-     * @param t
-     * @return
+     * Creates a localized checkbox
      */
     public static CheckBox checkBox(String key, Table t) {
-        CheckBox c = new CheckBox(local(key), Assets.SKIN);
-        t.add(c).padTop(20f); // DEFAULT SPACING
+        CheckBox c = new CheckBox(local(key), SKIN);
+        t.add(c).padTop(20f);
         return c;
     }
+
     /**
      * <h2>Creates and a button that shows a table in a cell when clicked.</h2>
      *
@@ -310,8 +314,6 @@ public abstract class StageWindow extends Window {
         actor.addListener(new LambdaClickListener(consumer));
         return actor;
     }
-
-    // TODO close region
 
     /**
      * <h2>Applies padding and fill to cells used in a menu style table</h2>
@@ -342,8 +344,8 @@ public abstract class StageWindow extends Window {
      * @param text     The body content of the dialog
      * @param positive The text shown in the positive button. If empty, shows "OK!"
      */
-    protected void dialog(String title, String text, String positive) {
-        dialog(title, text, positive, "");
+    protected void dialog(String titleKey, String textKey, String positive) {
+        dialog(titleKey, textKey, positive, "");
     }
 
     /**
@@ -354,8 +356,8 @@ public abstract class StageWindow extends Window {
      * @param positive The text shown in the positive button. If empty, shows "OK!"
      * @param negative The text shown in the negative button. If empty, no button is added.
      */
-    protected void dialog(String title, String text, String positive, String negative) {
-        dialog(title, text, positive, negative, null);
+    protected void dialog(String titleKey, String textKey, String positive, String negative) {
+        dialog(titleKey, textKey, positive, negative, null);
     }
 
     /**
@@ -367,18 +369,45 @@ public abstract class StageWindow extends Window {
      * @param negative      The text shown in the negative button. If empty, no button is added.
      * @param resultHandler The handler which handles the button press. If null, no handler is added.
      */
-    public void dialog(String title, String text, String positive, String negative, Consumer<Boolean> resultHandler) {
-        dialog(this, title, text, positive, negative, resultHandler);
+    public void dialog(String titleKey, String textKey, String positive, String negative, Consumer<Boolean> resultHandler, Actor... actors) {
+        dialog(this, titleKey, textKey, positive, negative, resultHandler, actors);
     }
 
-    /**
-     * <h2>Places a label on this window to act as the window title.</h2>
-     *
-     * @param windowStyle The style of the window, determines the placement and style of heading used.
-     * @param title       The title text
-     */
-    private void placeTitle(String windowStyle, String title) {
-        placeTitle(this, windowStyle, title);
+
+    // TODO change all strings to keys fetches
+    // TODO test the dialog. Fairly sure it's broken after changing the theme.
+    public static void dialog(Actor actor, String titleKey, String textKey, String positive, String negative, Consumer<Boolean> resultHandler,
+        Actor... actors
+    ) {
+        if (actor.getStage() == null)
+            throw new NullPointerException("Tried to show a dialog, but the caller was not on a stage.");
+
+        // Construct dialog, that gives the result to the handler
+        Dialog dialog = new Dialog("", SKIN) {
+            protected void result(Object object) {
+                if (resultHandler != null)
+                    resultHandler.accept((object == null) ? false : (boolean) object);
+            }
+        };
+
+        placeTitle(dialog, "", titleKey);
+
+        // Format and add content.
+        dialog.getContentTable().padTop(30).padBottom(30);
+        dialog.text(local(textKey));
+        dialog.add(actors);
+
+        // If text is provided, add corresponding buttons and handler.
+
+        if (!positive.equals(""))
+            dialog.button(positive, true);
+            // TODO Localise
+        else dialog.button("OK!");
+
+        if (!negative.equals(""))
+            dialog.button(negative, false);
+
+        dialog.show(actor.getStage());
     }
 
     /**
@@ -387,14 +416,31 @@ public abstract class StageWindow extends Window {
      * <p>
      * Once the button is added, automatically moves to the next row.
      *
-     * @param Text Text contained in the button
+     * @param Key Text contained in the button
      * @param e    Function of the button
      * @return the button created
      */
-    protected TextButton addButton(String Text, Consumer<InputEvent> e) {
-        TextButton b = button(Text, e);
-        add(b).fill().row();
+    protected TextButton addButton(String Key, Consumer<LambdaClickListener> e) { return addButton(Key, true, e); }
+    protected TextButton addButton(String Key, boolean newRow, Consumer<LambdaClickListener> e) { return addButton(Key, newRow, false, e); }
+    protected TextButton addButton(String Key, boolean newRow, boolean span, Consumer<LambdaClickListener> e) {
+        TextButton b = button(Key, e);
+        Cell c = add(b).expandX().fillX();
+        if (span) span(c);
+        if (newRow) row();
         clickSound(b);
+        return b;
+    }
+
+    /**
+     * <h2>Creates a button with a listener</h2>
+     *
+     * @param key key of local text to put in button
+     * @param e    Function of the button
+     * @return the button created
+     */
+    public static TextButton button(String key, Consumer<?> e) {
+        TextButton b = new TextButton(local(key), SKIN);
+        onClick(b, e);
         return b;
     }
 
@@ -417,6 +463,19 @@ public abstract class StageWindow extends Window {
     protected Cell row(Actor... actors) {
         row();
         return add(actors).row();
+    }
+
+    /**
+     * Centers a window in it's current state on it's stage
+     */
+    public void centerStage() {
+        int _alignment = getAlign();
+        align(Align.center);
+        setPosition(
+                Utility.center(getStage().getWidth(), getWidth()),
+                Utility.center(getStage().getHeight(), getHeight())
+        );
+        align(_alignment);
     }
 
     /**
@@ -474,52 +533,28 @@ public abstract class StageWindow extends Window {
      * <h2>Adds a label and a horizontal line with a good ammount of space above and below to seperate content in a column</h2>
      */
     protected StageWindow seperate(String key) {
-        // Create a label that will be the header
-        Label l = new Label(local(key), Assets.SKIN);
-
-        // Make it 20% bigger
-        l.setFontScale(1.2f);
-
-        // Put the text in the middle
-        l.setAlignment(Align.center);
-
-        // Add and adjust title
-        applyMenuStyling(span(add(l))).padTop(50).row();
-
-        hsep().padBottom(20).row();
-
+        seperate(this, key);
         return this;
     }
 
     /**
      * dumb compromise that allows statically seperating a table that isn't directly the stage window.
-     * @param t
-     * @param key
      */
     public static void seperate(Table t, String key) {
+        t.row();
         // Create a label that will be the header
-        Label l = new Label(local(key), Assets.SKIN);
+        Label l = new Label((key.isEmpty()) ? key : local(key), SKIN);
 
-        // Make it 20% bigger
-        l.setFontScale(1.2f);
-
-        // Put the text in the middle
-        l.setAlignment(Align.center);
-
-        // Add title
-        applyMenuStyling(t.add(l))
-                .colspan(t.getColumns())
-                .padTop(50)
+        hsep(t)
+                .padTop(10)
                 .row();
 
-        // Add seperator
-        t.add(new Label("", seperatorStyle))
+        // Add and adjust title
+        t.add(l)
                 .colspan(t.getColumns())
-                .height(3)
-                .bottom()
-                .padTop(20)
-                .padBottom(30)
+                .padTop(10)
                 .row();
+
     }
 
     /**
@@ -527,10 +562,14 @@ public abstract class StageWindow extends Window {
      *
      * @return The cell containing the horizontal seporator.
      */
-    protected Cell hsep() {
-        row();
-        Cell c = span(add(new Label("", seperatorStyle))).colspan(lastSpan).height(3).bottom();
-        row();
+    protected Cell hsep() { return span(hsep(this)); }
+    protected static Cell hsep(Table t) {
+        t.row();
+        Cell c = t.add(new Label("", seperatorStyle)).height(3);
+        c.padTop(3);
+        c.padBottom(3);
+        c.colspan(t.getColumns());
+        t.row();
         return c;
     }
 
@@ -552,139 +591,125 @@ public abstract class StageWindow extends Window {
      * @return t
      */
     public static final Actor tooltip(Actor t, String s){
-        t.addListener(new TextTooltip(s, Assets.SKIN));
+        t.addListener(new TextTooltip(s, SKIN));
         return t;
     }
 
     /**
-     * Adds a new item to the current row.
-     * <p>
-     * See super.
-     *
-     * @param actor
-     * @apiNote Override updates items which span entire window to account for newly created columns.
-     */
-    @Override
-    public final <T extends Actor> Cell<T> add(T actor) {
-        Cell c = super.add(actor);
-        updateColSpans();
-        return c;
-    }
-
-    /**
-     * Adds multiple items to the current row.
-     * <p>
-     * See super.
-     *
-     * @param actors
-     * @apiNote Override updates items which span entire window to account for newly created columns.
-     */
-    @Override
-    public final Table add(Actor... actors) {
-        Table c = super.add(actors);
-        updateColSpans();
-        return c;
-    }
-
-    /**
-     * Adds a cell without an actor, and update colspans.
-     */
-    @Override
-    public Cell add() {
-        Cell c = super.add();
-        updateColSpans();
-        return c;
-    }
-
-
-    /**
-     * # Adds a list in a scrollable pane of a fixed height
+     * Adds a list in a scrollable pane of a fixed height
      */
     protected void addList(com.badlogic.gdx.scenes.scene2d.ui.List<?> list, String tooltipKey) {
-        ScrollPane sp = new ScrollPane(list, Assets.SKIN);
+        ScrollPane sp = new ScrollPane(list, SKIN);
         add(sp).fillX();
         tooltip(tooltipKey);
         getCell(sp).height(100f);
         row();
     }
 
-    protected Cell span(Actor actor) {
-        return span(getCell(actor));
-    }
-
     /**
-     * Modifies the provided cell to span all columns of the window table.
+     * Logs the provided cell to be modified to span all columns of the window table.
      * <p>
-     * If more columns are added, this cell well have it's colspan updated to cover it.
-     *
-     * @param c The cell that should span the entire width of the window
-     * @return the cell
+     * Calling 'updateColSpans' will call colspan with the current column count
+     * for all cells added.
+     * @apiNote NB : The cell is spanned to the current column count, but is not automatically modified when the table is changed.
+     * @see StageWindow#updateColSpans()
      */
+    protected Cell span(Actor actor) { return span(getCell(actor)); }
     protected Cell span(Cell c) {
         spannedCells.add(c);
-        expandfill(c).center();
-        c.colspan(lastSpan);
+        c.expandX().fillX();
+        //c.colspan(Math.max(getColumns() - 1, 1)); // STOPSHIP this does not match the update col span.
+        row();
         return c;
     }
 
     /**
      * Updates all cells which should span all columns with the current number of columns.
      */
-    private void updateColSpans() {
-        updateColSpans(getColumns());
-    }
-
-    /**
-     * Updates all cells which should span all columns with the provided number of columns.
-     *
-     * @param columns
-     */
-    private void updateColSpans(int columns) {
-        if (columns <= lastSpan) return;
-
-        lastSpan = columns - 1;
-
+    protected void updateColSpans() {
         for (Cell c : spannedCells)
-            c.colspan(lastSpan);
-
+            c.colspan(Math.max(getColumns(), 1));
+        pack();
     }
 
-    public void setStage(Stage s) {
-        super.setStage(s);
-    }
-
+    //=====================================================================
+    //#endregion api extension
+    //#region misc functions
+    //=====================================================================
 
     @Override
-    public String toString() {
-        return title;
-    }
+    public String toString() { return title; }
 
     /**
-     * <h2>Constructs the content to be displayed in this window</h2>
-     */
-    protected abstract void constructContent();
-
-    /**
-     * Since window had no dispose, this is called instead on close to trigger onClose
+     * Used as an alias for close / dispose, since there was no dispose method available to override.
+     * <p>
+     *    upPost's and unHook's this window,
+     *    performs 'onClose',
+     *    and then calls super.clear to decompose  the window.
+     * </p>
      */
     @Override
     public final void clear() {
+        GameHypervisor.turn_unhook(this);
         onClose();
+
+        unPost(this);
         super.clear();
     }
 
+    /**
+     * Notification for implementation.
+     *
+     * This window is being closed & disposed.
+     */
     protected void onClose() {}
 
+    /**
+     * Inverts 'isVisible'.
+     * <p>
+     * Determines if this window is rendered and updated.
+     */
     public void toggleShown() {
         setVisible(!isVisible());
     }
 
     /**
-     * # Indicates that this window should not close, but instead just hide.
+     * Indicates that this window should not close, but instead just hide
+     * when the user clicks 'x'.
+     * <p>
+     * Useful for the functionality of the in-game menu system, where windows
+     * are toggled in visibility, and not disposed and re-created
+     * every time the user wants to see them.
+     *
+     * @apiNote This state is the default.
      */
-    public void dontClose() {
-        dontClose = true;
-    }
+    public void dontClose() { dontClose = true; }
+
+    /**
+     * Indicates that when the user clicks 'x',
+     * the window should be decomposed via 'clear'.
+     */
+    // TODO the new small windows that are not a part of the menu need to call this.
+    public void allowClose() { dontClose = false; }
+
+    /**
+     * Called on the end of every turn, indicating to
+     * open windows that they should update.
+     */
+    @Override
+    public void run() { refresh(); }
+
+    /**
+     * Optional notification to implementation.
+     *
+     * the turn has ended, update if you need to.
+     */
+    protected void refresh() {}
+
+    //=====================================================================
+    //#endregion
+    //#region useful stuff
+    //=====================================================================
 
     /**
      * <h2>Accepts a consumer to use when clicking a button, instead of an entire click listener class</h2>
@@ -692,22 +717,25 @@ public abstract class StageWindow extends Window {
      * define an entire implementation class of clickListenener, now just use a consumer.
      */
     public static class LambdaClickListener extends ClickListener {
-        private Consumer c;
+        private Consumer<ClickListener> c;
+        public InputEvent event;
 
-        public LambdaClickListener(Consumer<InputEvent> consumer) {
+        public LambdaClickListener(Consumer<ClickListener> consumer) {
             c = consumer;
         }
 
         @Override
         public void clicked(InputEvent event, float x, float y) {
-            c.accept(event);
+           this.event = event;
+            c.accept(this);
         }
     }
 
     public static class LambdaChangeListener extends ChangeListener {
-        private Consumer<ChangeEvent> c;
+        private Consumer<ChangeListener> c;
+        public ChangeEvent event;
 
-        public LambdaChangeListener(Consumer<ChangeEvent> consumer) {
+        public LambdaChangeListener(Consumer<ChangeListener> consumer) {
             c = consumer;
         }
 
@@ -717,7 +745,12 @@ public abstract class StageWindow extends Window {
          */
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            c.accept(event);
+            this.event = event;
+            c.accept(this);
         }
     }
+
+    //=====================================================================
+    //#endregion
+    //=====================================================================
 }
