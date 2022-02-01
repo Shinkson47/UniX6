@@ -175,6 +175,13 @@ class ScriptNode(key: String, payload : Runnable) : Tree.Node<Tree.Node<*, *, *>
     init {
         actor.addListener(StageWindow.LambdaClickListener {payload.run()})
     }
+
+    //*
+
+
+
+
+     /**/
 }
 
 

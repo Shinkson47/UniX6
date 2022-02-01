@@ -23,6 +23,8 @@ Splash Globe : WikiMedia Commons : CC BY-SA 3.0
 Menu BG : TeaHub : Personal
 Skin elements : Open Game Art : CC BY 3.0
 
+Retro Windows GUI : comp3interactive.itch.io : public domain
+
 FreeLand tileset : FreeCiv : GPL
 
 [ SPRITES ]

@@ -87,7 +87,8 @@ class Menu(val _parent : GameScreen) : Table(SKIN) {
 
 
         addMenuItem(this, "specific.windows.music.spotify", WindowAction(Spotify()),
-                MenuSubItem("meta.pseudographic.playPause")         { com.shinkson47.SplashX6.audio.Spotify.play() } ,
+                MenuSubItem("!|>")         { com.shinkson47.SplashX6.audio.Spotify.play() } ,
+                MenuSubItem("!||")         { com.shinkson47.SplashX6.audio.Spotify.pause() } ,
                 MenuSubItem("meta.pseudographic.next")              { com.shinkson47.SplashX6.audio.Spotify.next() },
                 MenuSubItem("meta.pseudographic.previous")          { com.shinkson47.SplashX6.audio.Spotify.previous() },
                 MenuSubItem("!Built-In", WindowAction(Music())),

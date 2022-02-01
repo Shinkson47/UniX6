@@ -16,11 +16,13 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.MapRenderer
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.Client.Companion.client
 import com.shinkson47.SplashX6.game.GameData
 import com.shinkson47.SplashX6.game.GameHypervisor
+import com.shinkson47.SplashX6.game.GameHypervisor.Companion.camera_focusOn
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.cm_isSelectingDestination
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.unit_selected
 import com.shinkson47.SplashX6.game.units.Unit
@@ -29,6 +31,7 @@ import com.shinkson47.SplashX6.rendering.Camera
 import com.shinkson47.SplashX6.utility.Debug
 import org.xguzm.pathfinding.grid.GridCell
 import java.util.function.Consumer
+
 
 /**
  * <h1>The screen used to display and interact with the game</h1>

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.shinkson47.SplashX6.Client;
 import com.shinkson47.SplashX6.audio.AudioController;
 import com.shinkson47.SplashX6.game.GameHypervisor;
@@ -270,6 +271,8 @@ public abstract class StageWindow extends Window implements TurnHook {
             w.getTitleTable().row();
             w.getTitleTable().align(Align.right);
         }
+
+        w.getTitleTable().debug();
     }
 
     /**
