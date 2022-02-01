@@ -33,10 +33,12 @@ public class SplashX6 {
 		// ===========================
 		// When developing, change to true to enable debug features.
 		// Check for DEBUG_MODE when writing a debug feature.
-		Client.DEBUG_MODE = false;
+		Client.DEBUG_MODE = true;
 
 		checkCICD(arg);
 		constructConfig();
+
+		splashscreen();
 
 		prebootComplete();
 	}
@@ -91,6 +93,11 @@ public class SplashX6 {
 		config.addIcon("sprites/icon.png", Files.FileType.Internal);
 	}
 
+	private static void splashscreen() {
+		Thread t = new Thread(new PreSplash());
+		t.start();
+		while (t.isAlive()) {}
+	}
 
 	private static void prebootComplete() {
 		if (Client.CI_CD)
