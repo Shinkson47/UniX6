@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.shinkson47.SplashX6.Client;
 import com.shinkson47.SplashX6.audio.AudioController;
@@ -256,6 +258,7 @@ public abstract class StageWindow extends Window implements TurnHook {
             // IMPLEMENT a way for the user to configure which side the buttons are placed on.
             // FIXME the buttons don't match the forehead size
             // Buttons
+            w.getTitleTable().add(button("!^", o -> ((StageWindow)w).toggleCollapse()));
             w.getTitleTable().add(button("meta.pseudographic.pack", o -> {w.pack();}));
 
             if (close)
@@ -679,6 +682,28 @@ public abstract class StageWindow extends Window implements TurnHook {
      */
     public void toggleShown() {
         setVisible(!isVisible());
+    }
+
+    private boolean collapsed = false;
+    private float collapsedHeight = 0;
+    private SnapshotArray<Actor> collasedCells;
+    public void toggleCollapse() {
+        //this.getCells().forEach( cell -> cell.getActor().setVisible(collapsed));
+        collapsed = !collapsed;
+        if (collapsed) {
+            collasedCells = getChildren();
+            getChildren().clear();
+            collapsedHeight = getMinHeight();
+            setHeight(0);
+            invalidate();
+
+        } else {
+            getChildren().addAll(collasedCells);
+            setHeight(collapsedHeight);
+        }
+
+
+        pack();
     }
 
     /**

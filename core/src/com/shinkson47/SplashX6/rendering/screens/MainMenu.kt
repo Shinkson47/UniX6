@@ -61,6 +61,8 @@ class MainMenu : ScalingScreenAdapter() {
             isResizable = false
             pack()
         }
+
+
     }
 
     //#region operations

@@ -61,7 +61,7 @@ class OptionsWindow(val parent : ScalingScreenAdapter) : StageWindow("generic.an
             RootNode(
                 "specific.preferences.misc",
                 RootNode(
-                    "!specific.preferences.tooltip.tooltip",
+                    "specific.preferences.tooltip.tooltip",
                     SliderNode<Float>(UtilityK::class.objectInstance!!, "ttInitialTime", "specific.preferences.tooltip.initial", 0f, 5f, 0.5f),
                     SliderNode<Float>(UtilityK, "ttSubsequentTime", "specific.preferences.tooltip.subsequent", 0f, 5f, 0.1f),
                     SliderNode<Float>(UtilityK, "ttResetTime", "specific.preferences.tooltip.reset", 0f, 5f, 0.1f),
