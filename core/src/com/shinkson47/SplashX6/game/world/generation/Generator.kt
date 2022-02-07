@@ -12,9 +12,12 @@ import com.shinkson47.SplashX6.game.world.generation.stages.*
  */
 object Generator {
 
+    // TODO seed on world creation screen
+    // TODO noise presets
+    // TODO user selects / disables stages
+    // TODO stage variables can be edited w/ reflection - like in the options
     // TODO resources used by world generation stages are never released.
     // ram is used to hold fnl and stage instances when generation is not being performed.
-
     val stages : Array<WorldGenerationStage> =
         arrayOf(
             // Create base world. Just water and land.
@@ -30,8 +33,10 @@ object Generator {
             InterpolationModStage()
         )
 
+
     // STOPSHIP: 03/07/2021 Debug only.
     // Stripped down world generation for quicker terrain gen testing.
+    var fastBuild = false
     val fastBuildStages : Array<WorldGenerationStage> =
         arrayOf(
             // Create base world. Just water and land.
@@ -40,8 +45,6 @@ object Generator {
             // Modify base with interesting stuff.
             VoronoiBiomeModStage(),
         )
-
-    var fastBuild = false
 
     fun doYourThing() : WorldTerrain {
         val terrain = WorldTerrain()
@@ -52,7 +55,7 @@ object Generator {
             fastBuildStages.forEach { it.execute(terrain) }
 
         if (Client.DEBUG_MODE)
-            terrain.defogAll()
+            terrain.removeFogOfWar()
 
         return terrain
     }

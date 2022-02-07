@@ -14,6 +14,8 @@ import static java.awt.GraphicsEnvironment.isHeadless;
  * <h1>Main entry point for Splash X6</h1>
  * Contains pre-boot scripture for configuration
  * of the engine, and meta-execution of tests.
+ *
+ * @author [Jordan T Gray](https://shinkson47.in)
  */
 public class SplashX6 {
 

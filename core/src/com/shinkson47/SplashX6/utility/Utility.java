@@ -10,8 +10,8 @@ import com.shinkson47.SplashX6.Client;
 import com.shinkson47.SplashX6.game.GameHypervisor;
 import com.shinkson47.SplashX6.game.world.FastNoiseLite;
 import com.shinkson47.SplashX6.rendering.windows.MessageWindow;
-import org.jetbrains.annotations.NotNull;
 
+import java.util.MissingResourceException;
 import java.util.function.Function;
 
 import static com.badlogic.gdx.math.MathUtils.random;
@@ -129,7 +129,15 @@ public final class Utility {
     }
 
     public static String local(String key) {
-        return (key.startsWith("!")) ? key.substring(1)  : LANG.get(key);
+        if (key.startsWith("!"))
+            return key.substring(1);
+
+        try {
+            return LANG.get(key);
+        } catch (MissingResourceException e) {
+            warn(e.getMessage());
+            return "???" + key + "???";
+        }
     }
 
     /**
@@ -230,5 +238,9 @@ public final class Utility {
         System.err.println("Warning for SplashX6 developers : " + s);
         if (Client.DEBUG_MODE && GameHypervisor.getInGame())
             new MessageWindow("!Developer Warning", "!" + s, true);
+    }
+
+    public static String AssertEndsWith(String s, String suffix) {
+        return (s.endsWith(suffix)) ? s : s + suffix;
     }
 }

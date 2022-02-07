@@ -1,9 +1,11 @@
 package com.shinkson47.SplashX6.game
 
 
+import com.shinkson47.SplashX6.game.cities.CityType
 import com.shinkson47.SplashX6.game.units.Unit
 import com.shinkson47.SplashX6.game.world.WorldTerrain
 import com.shinkson47.SplashX6.game.world.generation.Generator
+import com.shinkson47.SplashX6.utility.PartiallySerializable
 import java.io.Serializable
 
 /**
@@ -14,9 +16,9 @@ import java.io.Serializable
  * @version 1.1
  */
 @JvmField
-val GameData = _GameData()
+var GameData = _GameData()
 
-class _GameData : Serializable {
+class _GameData : PartiallySerializable {
 
     /**
      * # The tile layers making up the world.
@@ -35,7 +37,10 @@ class _GameData : Serializable {
     @JvmField var player : Civilisation? = null
 
 
-
+    // ======================================
+    // New game preferences
+    // ======================================
+    var pref_civType = CityType.asian
 
 
 
@@ -59,19 +64,27 @@ class _GameData : Serializable {
     /**
      * New game subroutines that creates data required for a new game
      */
-    fun new(){
+    fun new() {
         clear()
-        player = GameHypervisor.civ_new()
-        world = Generator.doYourThing();
+        player = GameHypervisor.civ_new(pref_civType)
+        world = Generator.doYourThing()
         world!!.genPopulation()
     }
 
     fun networkSet(gameState: _GameData) {
-        world           = gameState.world
-        world!!.networkCreate()
-        world!!.defogAll()
-        civilisations   = gameState.civilisations
-
+        world = gameState.world
         GameHypervisor.gameRenderer!!.newRenderer()
+
+        civilisations = gameState.civilisations
+        deserialize()
+    }
+
+    override fun deserialize() {
+        world!!.deserialize()
+
+        civilisations.forEach {
+            it.units.forEach  { it.deserialize() }
+            it.cities.forEach { it.deserialize() }
+        }
     }
 }

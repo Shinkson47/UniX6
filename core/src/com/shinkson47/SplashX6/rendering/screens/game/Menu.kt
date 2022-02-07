@@ -1,28 +1,40 @@
 package com.shinkson47.SplashX6.rendering.screens.game
 
+import com.badlogic.gdx.Game
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.gdx.musicevents.tool.file.FileChooser
 import com.shinkson47.SplashX6.game.GameData
 import com.shinkson47.SplashX6.game.GameHypervisor
+import com.shinkson47.SplashX6.game.cities.Production
+import com.shinkson47.SplashX6.game.units.UnitClass
+import com.shinkson47.SplashX6.network.Packet
+import com.shinkson47.SplashX6.network.PacketType
 import com.shinkson47.SplashX6.network.Server
 import com.shinkson47.SplashX6.rendering.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.MessageWindow
 import com.shinkson47.SplashX6.rendering.windows.OptionsWindow
 import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
 import com.shinkson47.SplashX6.rendering.windows.game.Music
+import com.shinkson47.SplashX6.rendering.windows.game.W_Settlements
 import com.shinkson47.SplashX6.rendering.windows.game.Spotify
+import com.shinkson47.SplashX6.rendering.windows.game.W_Help
 import com.shinkson47.SplashX6.rendering.windows.game.units.W_UnitsList
 import com.shinkson47.SplashX6.utility.Assets.SKIN
-import com.shinkson47.SplashX6.utility.Utility
+import com.shinkson47.SplashX6.utility.Debug.DebugWindow
+import com.shinkson47.SplashX6.utility.Utility.AssertEndsWith
 import com.shinkson47.SplashX6.utility.Utility.local
 
 /**
  * # The menu bar used in-game to access tools, windows and more.
  */
 class Menu(val _parent : GameScreen) : Table(SKIN) {
+
+    val chooser = FileChooser.createSaveDialog("Choose save location", SKIN, Gdx.files.external("/"))
     // TODO raise drop down to top
     companion object {
         /**
@@ -56,44 +68,64 @@ class Menu(val _parent : GameScreen) : Table(SKIN) {
         //setBackground(SKIN.getDrawable("widet10"))
         _parent.stage.addActor(subActionMenu)
 
+        chooser.setResultListener { success, result ->
+            if (success)
+                GameHypervisor.save(Gdx.files.external(AssertEndsWith(result.path(), ".X6")).file())
+            true
+        }
+
+        chooser.setFilter { file -> file.path.matches(Regex("(.*(?:X6))")) || (file.isDirectory && !file.name.startsWith(".")) }
+        chooser.setOkButtonText("Save")
+        chooser.isResizable = true
+
 
         // =========================================================
         //              Menu bar construction.
+        // =========================================================
 
         addMenuItem(this, "generic.game.game", NOTHING,
                 MenuSubItem("generic.any.options", WindowAction(OptionsWindow(_parent))) ,
                 MenuSubItem("generic.game.new")         { GameHypervisor.NewGame() } ,
-                MenuSubItem("generic.game.load")        { GameHypervisor.load() } ,
+                //MenuSubItem("generic.game.load")           { GameHypervisor.load() } ,
                 MenuSubItem("generic.game.quickload")   { GameHypervisor.quickload() } ,
-                MenuSubItem("generic.game.save")        { GameHypervisor.save() } ,
+                MenuSubItem("generic.game.save")        { chooser.show(stage) } ,
                 MenuSubItem("generic.game.quicksave")   { GameHypervisor.quicksave() } ,
                 MenuSubItem("generic.game.end")         { GameHypervisor.EndGame() }
         )
 
-        addMenuItem(this, "!Debug", WindowAction(com.shinkson47.SplashX6.utility.Debug.MainDebugWindow),
-                MenuSubItem("!Defog All") { GameData.world!!.defogAll() },
+        addMenuItem(this, "!Help", WindowAction(W_Help()))
+
+        addMenuItem(this, "!Debug", WindowAction(DebugWindow()),
+                MenuSubItem("!Defog All") { GameData.world!!.removeFogOfWar() },
+                MenuSubItem("!Reload Help Text") { W_Help.reload() },
                 MenuSubItem("!World Generation", WindowAction(TerrainGenerationEditor())),
                 MenuSubItem("!Publish Game") {Server.boot()},
-                MenuSubItem("!Connect Locally") {com.shinkson47.SplashX6.network.Client.connect()},
+                MenuSubItem("!Connect Locally") {com.shinkson47.SplashX6.network.NetworkClient.connect()},
+                MenuSubItem("!Notify Start") {Server.sendToAllClients(Packet(PacketType.Start, GameData))},
                 MenuSubItem("!Show a message") {MessageWindow("Hello", "Everything is fine :)")},
-                MenuSubItem("!Show an error") { MessageWindow("Fuck you", "Everything is broken", true)}
+                MenuSubItem("!Show an error") { MessageWindow("Fuck you", "Everything is broken", true)},
+
+                MenuSubItem("!Add a production project") { GameData.player!!.cities[0].production.queue(Production.UnitProductionProject(UnitClass.chariot)) }
         )
 
 
         addMenuItem(this, "specific.windows.music.spotify", WindowAction(Spotify()),
-                MenuSubItem("meta.pseudographic.playpause")         { com.shinkson47.SplashX6.audio.Spotify.play() } ,
+                MenuSubItem("meta.pseudographic.playPause")         { com.shinkson47.SplashX6.audio.Spotify.play() } ,
                 MenuSubItem("meta.pseudographic.next")              { com.shinkson47.SplashX6.audio.Spotify.next() },
                 MenuSubItem("meta.pseudographic.previous")          { com.shinkson47.SplashX6.audio.Spotify.previous() },
-                MenuSubItem("!Built-In", WindowAction(Music()))
+                MenuSubItem("!Built-In", WindowAction(Music())),
+                MenuSubItem("specific.windows.music.connect") { com.shinkson47.SplashX6.audio.Spotify.create() }
         )
 
-        addMenuItem(this, "specific.menubar.warroom", {GameHypervisor.cm_toggle()},
-                MenuSubItem("generic.any.manage")     { W_UnitsList() },
-                MenuSubItem("specific.windows.units.view")            { GameHypervisor.unit_view() },
-                MenuSubItem("specific.windows.units.viewDestination") { GameHypervisor.unit_viewDestination() },
-                MenuSubItem("specific.windows.units.setDestination")  { GameHypervisor.unit_setDestination() },
-                MenuSubItem("specific.windows.units.disband")         { GameHypervisor.unit_disband() },
-                )
+        addMenuItem(
+            this, "specific.menubar.warroom", { GameHypervisor.cm_toggle() },
+            MenuSubItem("generic.game.settlements") { W_Settlements() },
+            MenuSubItem("generic.game.units") { W_UnitsList() },
+            MenuSubItem("specific.windows.units.view") { GameHypervisor.unit_view() },
+            MenuSubItem("specific.windows.units.viewDestination") { GameHypervisor.unit_viewDestination() },
+            MenuSubItem("specific.windows.units.setDestination") { GameHypervisor.unit_setDestination() },
+            MenuSubItem("specific.windows.units.disband") { GameHypervisor.unit_disband() },
+        )
 
         addMenuItem(this, "generic.game.endTurn", { GameHypervisor.turn_end() })
     }

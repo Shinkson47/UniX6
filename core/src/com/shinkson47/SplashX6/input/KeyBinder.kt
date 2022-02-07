@@ -2,16 +2,19 @@ package com.shinkson47.SplashX6.input
 
 import com.badlogic.gdx.*
 import com.shinkson47.SplashX6.Client
+import com.shinkson47.SplashX6.game.GameData
 import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.EndGame
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.NewGame
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.cm_enter
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.cm_exit
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.turn_end
-import com.shinkson47.SplashX6.rendering.screens.GameManagementScreen
+import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.rendering.screens.Warroom
 import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
 import com.shinkson47.SplashX6.rendering.screens.MainMenu
 import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
+import com.shinkson47.SplashX6.rendering.windows.game.units.W_Unit
 import com.shinkson47.SplashX6.utility.APICondition.Companion.MSG_TRIED_EXCEPT
 import com.shinkson47.SplashX6.utility.APICondition.Companion.REQ_IN_GAME
 import com.shinkson47.SplashX6.utility.APICondition.Companion.THROW
@@ -84,7 +87,7 @@ object KeyBinder : InputAdapter() {
             // Function keys.
             bind(this, Input.Keys.F1) { cm_enter() }
             bind(this, Input.Keys.F2) { cm_exit()  }
-            bind(this, Input.Keys.F3) { GameHypervisor.gameRenderer!!.hudStage.addActor(TerrainGenerationEditor())  }
+            bind(this, Input.Keys.F3) { GameHypervisor.gameRenderer!!.stage.addActor(TerrainGenerationEditor())  }
             bind(this, Input.Keys.F5) { NewGame()  }
 
             // Numbers toggle active tool window.
@@ -118,7 +121,7 @@ object KeyBinder : InputAdapter() {
         // ========================================
 
 
-        with (GameManagementScreen::class.java) {
+        with (Warroom::class.java) {
             bind(this, Input.Keys.E) { turn_end() }
             bind(this, Input.Keys.TAB) { cm_exit() }
         }
@@ -148,9 +151,21 @@ object KeyBinder : InputAdapter() {
             bind(this, Input.Keys.S, true) { camera.down() }
             bind(this, Input.Keys.D, true) { camera.right() }
             bind(this, Input.Keys.A, true) { camera.left() }
+            bind(this, Input.Keys.UP, true) { camera.up() }
+            bind(this, Input.Keys.DOWN, true) { camera.down() }
+            bind(this, Input.Keys.RIGHT, true) { camera.right() }
+            bind(this, Input.Keys.LEFT, true) { camera.left() }
+
+            bind(this, Input.Keys.C, false) { GameHypervisor.unit_view() }
+            bind(this, Input.Keys.X, false) { GameData.selectedUnit?.let { StageWindow.post(W_Unit(it)) } }
+            bind(this, Input.Keys.GRAVE, false) { StageWindow.unPostAll() }
+            bind(this, Input.Keys.SPACE, false) { GameHypervisor.cm_destinationSelect() }
+
+
+            bind(this, Input.Keys.NUMPAD_ADD, true) { camera.desiredPosition.desired.z += 20 }
         }
 
-        with (GameManagementScreen::class.java) {
+        with (Warroom::class.java) {
             // Camera control
             bind(this, Input.Keys.W, true) { GameHypervisor.gameRenderer!!.managementScreen.up() }
             bind(this, Input.Keys.S, true) { GameHypervisor.gameRenderer!!.managementScreen.down() }

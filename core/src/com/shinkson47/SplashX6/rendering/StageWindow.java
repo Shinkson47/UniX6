@@ -13,7 +13,9 @@ import com.badlogic.gdx.utils.Align;
 import com.shinkson47.SplashX6.Client;
 import com.shinkson47.SplashX6.audio.AudioController;
 import com.shinkson47.SplashX6.game.GameHypervisor;
+import com.shinkson47.SplashX6.utility.TurnHook;
 import com.shinkson47.SplashX6.utility.Utility;
+import com.shinkson47.SplashX6.utility.UtilityK;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.function.Consumer;
 import static com.shinkson47.SplashX6.audio.AudioController.GUI_SOUND;
 import static com.shinkson47.SplashX6.utility.Assets.SKIN;
 import static com.shinkson47.SplashX6.utility.Utility.local;
+import static java.lang.System.gc;
 
 /**
  * <h1>Splash X6's in-game GUI window.</h1>
@@ -39,7 +42,7 @@ import static com.shinkson47.SplashX6.utility.Utility.local;
  * @version 2
  * @since v1
  */
-public abstract class StageWindow extends Window implements Runnable {
+public abstract class StageWindow extends Window implements TurnHook {
 
     //=====================================================================
     //#region Companion
@@ -103,7 +106,7 @@ public abstract class StageWindow extends Window implements Runnable {
      */
     public static void post(StageWindow sw) {
         if (!GameHypervisor.getInGame()) return;
-        Stage s = GameHypervisor.getGameRenderer().getHUDStage();
+        Stage s = GameHypervisor.getGameRenderer().stage;
         s.addActor(sw);
 
         // IMPLEMENT a way for the user to configure where windows are created.
@@ -134,6 +137,7 @@ public abstract class StageWindow extends Window implements Runnable {
         for (StageWindow sw : WINDOW_DOCK.getItems()) {
             WINDOW_DOCK.getItems().removeValue(sw, true);
             sw.clear();
+            gc();
         }
     }
 
@@ -395,6 +399,7 @@ public abstract class StageWindow extends Window implements Runnable {
         // Format and add content.
         dialog.getContentTable().padTop(30).padBottom(30);
         dialog.text(local(textKey));
+        dialog.row();
         dialog.add(actors);
 
         // If text is provided, add corresponding buttons and handler.
@@ -591,7 +596,7 @@ public abstract class StageWindow extends Window implements Runnable {
      * @return t
      */
     public static final Actor tooltip(Actor t, String s){
-        t.addListener(new TextTooltip(s, SKIN));
+        t.addListener(new TextTooltip(s, UtilityK.INSTANCE.getTtManager(), SKIN));
         return t;
     }
 
@@ -692,12 +697,13 @@ public abstract class StageWindow extends Window implements Runnable {
     // TODO the new small windows that are not a part of the menu need to call this.
     public void allowClose() { dontClose = false; }
 
-    /**
-     * Called on the end of every turn, indicating to
-     * open windows that they should update.
-     */
     @Override
-    public void run() { refresh(); }
+    public void onTurn() { refresh(); }
+
+    // I hate this, it re-implements but java would require every window to implement it. idk man.
+
+    @Override public void run() { doOnTurn(); }
+    @Override public void doOnTurn() { onTurn(); }
 
     /**
      * Optional notification to implementation.

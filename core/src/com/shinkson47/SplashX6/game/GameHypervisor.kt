@@ -1,14 +1,16 @@
 package com.shinkson47.SplashX6.game;
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
+import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.Client.Companion.DEBUG_MODE
 import com.shinkson47.SplashX6.Client.Companion.client
 import com.shinkson47.SplashX6.audio.AudioController
 import com.shinkson47.SplashX6.audio.GamePlaylist
 import com.shinkson47.SplashX6.audio.Spotify
 import com.shinkson47.SplashX6.game.cities.City
-import com.shinkson47.SplashX6.game.cities.CityTypes
+import com.shinkson47.SplashX6.game.cities.CityType
 import com.shinkson47.SplashX6.game.units.Unit
 import com.shinkson47.SplashX6.game.units.UnitClass
 import com.shinkson47.SplashX6.game.world.WorldTerrain
@@ -17,21 +19,27 @@ import com.shinkson47.SplashX6.game.world.WorldTerrain.Companion.TILE_HALF_HEIGH
 import com.shinkson47.SplashX6.game.world.WorldTerrain.Companion.TILE_HALF_WIDTH
 import com.shinkson47.SplashX6.game.world.WorldTerrain.Companion.cartesianToIso
 import com.shinkson47.SplashX6.input.KeyBinder
+import com.shinkson47.SplashX6.network.NetworkClient
+import com.shinkson47.SplashX6.network.Packet
+import com.shinkson47.SplashX6.network.PacketType
+import com.shinkson47.SplashX6.network.Server
 import com.shinkson47.SplashX6.rendering.StageWindow
 import com.shinkson47.SplashX6.rendering.screens.MainMenu
+import com.shinkson47.SplashX6.rendering.screens.Warroom
 import com.shinkson47.SplashX6.rendering.screens.WorldCreation
 import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
-import com.shinkson47.SplashX6.rendering.windows.GameWindowManager
-import com.shinkson47.SplashX6.rendering.windows.MessageWindow
-import com.shinkson47.SplashX6.rendering.windows.game.units.W_UnitsList
 import com.shinkson47.SplashX6.utility.APICondition.Companion.MSG_TRIED_EXCEPT
+import com.shinkson47.SplashX6.utility.APICondition.Companion.REQ_CLIENT_CONNECTED
 import com.shinkson47.SplashX6.utility.APICondition.Companion.REQ_IN_GAME
 import com.shinkson47.SplashX6.utility.APICondition.Companion.REQ_NOT_IN_GAME
 import com.shinkson47.SplashX6.utility.APICondition.Companion.THROW
 import com.shinkson47.SplashX6.utility.APICondition.Companion.invalidCall
 import com.shinkson47.SplashX6.utility.APICondition.Companion.validateCall
 import com.shinkson47.SplashX6.utility.Debug
+import com.shinkson47.SplashX6.utility.TurnHook
 import com.shinkson47.SplashX6.utility.Utility
+import java.io.*
+
 import java.lang.Thread.sleep
 
 /**
@@ -67,13 +75,13 @@ class GameHypervisor {
          * # Runnables to be performed on [turnEnd].
          * Removed after being performed once.
          */
-        private val TURN_ASYNC_TASKS : ArrayList<Runnable> = ArrayList()
+        private val TURN_ASYNC_TASKS : ArrayList<TurnHook> = ArrayList()
 
         /**
          * # Runnables to be performed on [turnEnd].
          * Kept until removed, activated every turn.
          */
-        private val TURN_HOOKS : ArrayList<Runnable> = ArrayList()
+        private val TURN_HOOKS : ArrayList<TurnHook> = ArrayList()
 
 
         //========================================================================
@@ -81,6 +89,10 @@ class GameHypervisor {
         //#region construction
         //========================================================================
 
+        fun ConnectGame() {
+            validateCall(REQ_CLIENT_CONNECTED, THROW("Cannot load a game from server if not connected to a server."))
+            client!!.fadeScreen(WorldCreation(isConnecting = true))
+        }
 
         /**
          * # Initiates the creation of a new game
@@ -104,9 +116,12 @@ class GameHypervisor {
          */
         @JvmStatic
         fun doNewGameCallback() {
-            //validateCall(REQ_GAME_LOADING, THROW("Tried to load a game whilst not loading."))
+            GameData.new() // create game data. Must be before game screen is created.
+            doGameLoadCallback()
+        }
 
-            Gdx.graphics.isContinuousRendering = false;
+        fun doGameLoadCallback() {
+            Gdx.graphics.isContinuousRendering = false
 
             doNewGamePRE()
             inGame = true
@@ -115,7 +130,7 @@ class GameHypervisor {
 
             doNewGameFINAL()
 
-            Gdx.graphics.isContinuousRendering = true;
+            Gdx.graphics.isContinuousRendering = true
         }
 
         /**
@@ -124,12 +139,9 @@ class GameHypervisor {
          * Contains calls which do not require a game to be loaded.
          */
         private fun doNewGamePRE() {
-            GameData.new() // create game data. Must be before game screen is created.
-
             // Create a new game screen stored locally. It will be shown to the user in the FINAL.
             // For now, loading screen is still being displayed. This is just so we can access the camera and whatnot.
             gameRenderer = GameScreen()
-
         }
 
         /**
@@ -144,6 +156,8 @@ class GameHypervisor {
             unit_view()             // Focus the camera on that unit.
             camera_skipMovement();  // Skip the camera travelling from 0,0 to the unit.
                                     // without that, the game always starts with the camera flying across the map.
+
+            Spotify.create(autoOnly = true) // Try to connect to the api at startup. Don't prompt.
         }
 
         /**
@@ -158,6 +172,13 @@ class GameHypervisor {
 
             if (!DEBUG_MODE) Spotify.pause()      // If possible, stop spotify.
             AudioController.playPlaylist(GamePlaylist());
+            switchToGameScreen()
+
+            if (Server.alive)
+                Server.sendToAllClients(Packet(PacketType.Start, GameData))
+        }
+
+        private fun switchToGameScreen() {
             client?.fadeScreen(gameRenderer!!)    // Show the game screen to the user.
         }
 
@@ -174,10 +195,43 @@ class GameHypervisor {
             TODO()
         }
 
+        /**
+         * We are not in game, and are loading one.
+         *
+         * Populates GameData from a serialized file, then loads the game ui.
+         */
         @JvmStatic
-        fun load() {
+        fun load(f : File) {
             validateCall(REQ_NOT_IN_GAME, THROW(MSG_TRIED_EXCEPT("load a game", "a game is already loaded")))
-            TODO()
+            load(ObjectInputStream(FileInputStream(f)).readObject() as _GameData)
+        }
+
+        /**
+         * We are not in game, and are loading one.
+         *
+         * Populates GameDate from an existing instance, then loads the ui.
+         */
+        @JvmStatic
+        fun load(gd : _GameData) {
+            validateCall(REQ_NOT_IN_GAME, THROW(MSG_TRIED_EXCEPT("load a game", "a game is already loaded")))
+            GameData = gd
+            GameData.deserialize()
+            doGameLoadCallback()
+
+        }
+
+        /**
+         * We are already in-game, and are changing the game data.
+         *
+         * GameData is replaced and de-serialized.
+         *
+         * A new renderer is created to render the world.
+         */
+        @JvmStatic
+        fun update(newData: _GameData) {
+            GameData = newData
+            GameData.deserialize()
+            gameRenderer!!.newRenderer()
         }
 
         @JvmStatic
@@ -189,9 +243,9 @@ class GameHypervisor {
         }
 
         @JvmStatic
-        fun save() {
+        fun save(f: File) {
             validateCall(REQ_IN_GAME, THROW(MSG_TRIED_EXCEPT("save a game", "no game is loaded")))
-            TODO()
+            ObjectOutputStream(FileOutputStream(f)).writeObject(GameData)
         }
 
         /**
@@ -219,7 +273,8 @@ class GameHypervisor {
             try {
                 s = Unit(spriteName, x, y)
             } catch (ignore: Exception) {
-                return;
+                return
+                // TODO don't ignore this...
             }
 
             assert (s != null)
@@ -228,8 +283,8 @@ class GameHypervisor {
             GameData.player!!.units.add(s)
         }
 
-        fun civ_new() : Civilisation {
-            val c = Civilisation()
+        fun civ_new(civType: CityType): Civilisation {
+            val c = Civilisation(civType)
             GameData.civilisations.add(c)
             return c
         }
@@ -348,19 +403,33 @@ class GameHypervisor {
          * actions run on [turn_end]
          */
         @JvmStatic
-        fun turn_asyncTask(runnable: Runnable) = TURN_ASYNC_TASKS.add(runnable)
+        fun turn_asyncTask(runnable: TurnHook) = TURN_ASYNC_TASKS.add(runnable)
+
+        @JvmStatic @Deprecated("Runnables have been replaced by the [TurnHook] alias.")
+        fun turn_asyncTask(runnable: Runnable) = turn_asyncTask(object : TurnHook {
+            override fun onTurn() { runnable.run() }
+        })
 
         /**
          * # Stores a runnable that will be invoked after every turn.
          */
         @JvmStatic
-        fun turn_hook(runnable: Runnable) = TURN_HOOKS.add(runnable)
+        fun turn_hook(runnable: TurnHook) = TURN_HOOKS.add(runnable)
+
+
+        @JvmStatic @Deprecated("Runnables have been replaced by the [TurnHook] alias.")
+        fun turn_hook(runnable: Runnable) = turn_hook(object : TurnHook {
+            override fun onTurn() { runnable.run() }
+        })
 
         /**
          * # Removes a [turn_hook]
          */
         @JvmStatic
-        fun turn_unhook(runnable: Runnable) = TURN_HOOKS.remove(runnable)
+        fun turn_unhook(runnable: TurnHook) = TURN_HOOKS.remove(runnable)
+
+        @JvmStatic @Deprecated("Runnables have been replaced by the [TurnHook] alias.")
+        fun turn_unhook(runnable: Runnable) = turn_unhook(runnable as TurnHook)
 
 
         /**
@@ -380,6 +449,33 @@ class GameHypervisor {
 
         //========================================================================
         //#endregion game control
+        //#region settlement
+        //========================================================================
+
+
+        /**
+         * # Creates a size 0 settlement at [x],[y] in style matching the player's [civType]
+         * Does so using data from provided unit. Assumes unit is a settler.
+         * Unit is disbanded after.
+         */
+        fun settle(it : Unit) {
+            settle(it.isoVec.cpy(), GameData.player!!.civType)
+
+            unit_select(it)
+            unit_disband()
+        }
+
+        /**
+         * # Creates a size 0 settlement at [x],[y] with the provided style.
+         */
+        fun settle(pos: Vector3, type : CityType) {
+            GameData.player!!.cities.add(City(pos, type))
+        }
+
+
+
+        //========================================================================
+        //#endregion settlement
         //#region camera control
         //========================================================================
 
@@ -425,7 +521,7 @@ class GameHypervisor {
         @JvmStatic
         fun camera_focusingOnTile(): Vector3 {
             val v = camera_focusingOn()
-            return WorldTerrain.cartesianToIso(v.x.toInt(), v.y.toInt())
+            return cartesianToIso(v.x.toInt(), v.y.toInt())
         }
 
 
@@ -517,11 +613,14 @@ class GameHypervisor {
         fun cm_selectedTile() : Vector3 {
             //validateCall(REQ_UNIT_CONTROL_MODE) { cm_enter(); }
 
-            // Get point on world that mouse is pointing to.
-            val unprojected = gameRenderer!!.managementScreen.camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
+            return if (client!!.currentScreen is Warroom) {
+                // Get point on world that mouse is pointing to.
+                val unprojected = gameRenderer!!.managementScreen.camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
 
-            // Find what tile that is and return it.
-            return cartesianToIso(unprojected.x.toInt(), unprojected.y.toInt())
+                // Find what tile that is and return it.
+                cartesianToIso(unprojected.x.toInt(), unprojected.y.toInt())
+            } else
+                camera_focusingOnTile()
         }
 
         /**
@@ -584,25 +683,6 @@ class GameHypervisor {
             dispose()
             if (!DEBUG_MODE) Spotify.pause()
             client!!.fadeScreen(MainMenu())
-        }
-
-        /**
-         * # Creates a size 0 settlement at [x],[y] in style matching the player's [civType]
-         * Does so using data from provided unit. Assumes unit is a settler.
-         * Unit is disbanded after.
-         */
-        fun settle(it : Unit) {
-            settle(it.isoVec.cpy(), GameData.player!!.civType)
-
-            unit_select(it)
-            unit_disband()
-        }
-
-        /**
-         * # Creates a size 0 settlement at [x],[y] with the provided style.
-         */
-        fun settle(pos: Vector3, type : CityTypes) {
-            GameData.player!!.cities.add(City(pos, type))
         }
 
 

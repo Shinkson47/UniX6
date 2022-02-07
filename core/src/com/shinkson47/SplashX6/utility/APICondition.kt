@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.game.GameHypervisor
+import com.shinkson47.SplashX6.network.NetworkClient
+import com.shinkson47.SplashX6.network.Server
 import com.shinkson47.SplashX6.rendering.StageWindow
-import com.shinkson47.SplashX6.rendering.screens.GameManagementScreen
+import com.shinkson47.SplashX6.rendering.screens.Warroom
 import com.shinkson47.SplashX6.rendering.screens.MainMenu
 import com.shinkson47.SplashX6.rendering.screens.WorldCreation
 import java.util.function.Predicate
@@ -83,6 +85,7 @@ class APICondition @JvmOverloads constructor() {
 
 
 
+
         /**
          * # Shows a modal dialog with [message] which [THROW]s when user acknowledges
          * to notify user before [THROW]ing to prevent API call. Use if user is responsible for invalid call.
@@ -98,8 +101,8 @@ class APICondition @JvmOverloads constructor() {
             }
         }
 
-
-
+        @JvmField
+        val DO_NOTHING: Runnable = Runnable { }
 
 
 
@@ -132,7 +135,13 @@ class APICondition @JvmOverloads constructor() {
         val REQ_MAIN_MENU: Predicate<Any?> = Predicate { Client.client?.screen is MainMenu }
 
         @JvmField
-        val REQ_UNIT_CONTROL_MODE: Predicate<Any?> = Predicate { Client.client?.screen is GameManagementScreen }
+        val REQ_UNIT_CONTROL_MODE: Predicate<Any?> = Predicate { Client.client?.screen is Warroom }
+
+        @JvmField
+        val REQ_CLIENT_CONNECTED: Predicate<Any?> = Predicate { NetworkClient.isConnected() }
+
+        @JvmField
+        val REQ_SERVER_HOSTING: Predicate<Any?> = Predicate { Server.alive }
 
 
 
