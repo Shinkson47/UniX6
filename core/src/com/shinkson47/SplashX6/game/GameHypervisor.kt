@@ -127,8 +127,6 @@ class GameHypervisor {
 
             doNewGamePOST()
 
-            doNewGameFINAL()
-
             Gdx.graphics.isContinuousRendering = true
         }
 
@@ -149,8 +147,6 @@ class GameHypervisor {
          * Contains calls which require a game to be loaded.
          */
         private fun doNewGamePOST(){
-            gameRenderer!!.createUI() // Populate the game screen with GUI. can't be done whilst gr is null.
-
             unit_select(0)    // Select the first unit created at world gen. Should be a settler.
             unit_view()             // Focus the camera on that unit.
             camera_skipMovement();  // Skip the camera travelling from 0,0 to the unit.
@@ -163,7 +159,9 @@ class GameHypervisor {
          * # Game creation sub-routine
          * Final touches applied after game has been created
          */
-        private fun doNewGameFINAL(){
+        fun doNewGameFINAL(){
+            gameRenderer!!.createUI() // Populate the game screen with GUI. can't be done whilst gr is null.
+
             // TODO This couldn't be done before a world is created, but is only temporary.
             // STOPSHIP : 17/04/2021 this is dumb and shouldn't stay
             Debug.create()
@@ -177,7 +175,7 @@ class GameHypervisor {
                 Server.sendToAllClients(Packet(PacketType.Start, GameData))
         }
 
-        private fun switchToGameScreen() {
+        fun switchToGameScreen() {
             client?.fadeScreen(gameRenderer!!)    // Show the game screen to the user.
         }
 
@@ -665,6 +663,7 @@ class GameHypervisor {
          */
         @JvmStatic
         fun dispose() {
+            Server.shutdown()
             inGame = false
             StageWindow.unPostAll()
             gameRenderer?.dispose()

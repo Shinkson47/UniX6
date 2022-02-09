@@ -1,24 +1,29 @@
 package com.shinkson47.SplashX6.rendering.screens
 
-import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
-import com.shinkson47.SplashX6.utility.Assets
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.shinkson47.SplashX6.Client
+import com.shinkson47.SplashX6.ai.StateMachine
 import com.shinkson47.SplashX6.game.GameData
+import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.doNewGameCallback
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.inGame
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.load
 import com.shinkson47.SplashX6.game.cities.CityType
+import com.shinkson47.SplashX6.network.NetworkClient.isConnected
 import com.shinkson47.SplashX6.network.Server
+import com.shinkson47.SplashX6.network.Server.alive
+import com.shinkson47.SplashX6.network.Server.boot
+import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
 import com.shinkson47.SplashX6.rendering.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
+import com.shinkson47.SplashX6.utility.Assets
 import com.shinkson47.SplashX6.utility.Assets.SKIN
 import com.shinkson47.SplashX6.utility.UtilityK.getIP
+
 
 /**
  * # Provides the user a place to configure the game and world generation
@@ -32,7 +37,7 @@ import com.shinkson47.SplashX6.utility.UtilityK.getIP
 class WorldCreation(val isConnecting : Boolean = false) : ScalingScreenAdapter() {
 
     //==========================================
-    //#region fields
+    //#region actors
     //==========================================
 
     /**
@@ -41,23 +46,22 @@ class WorldCreation(val isConnecting : Boolean = false) : ScalingScreenAdapter()
     private val tipLabel = Label("", SKIN)
 
     /**
-     * Used to ensure that the loading screen has been rendered
-     * before starting the loading. Ensures there's something
-     * displayed.
+     * # Table containing content displayed whilst loading
      */
-    private var loadingScreenRendered = false
+    private val loadingContainer = Table()
 
     /**
-     * True when the user has clicked 'New Game'.
+     * # Window containing game configuration controls.
      */
-    private var userFinished = false
-
     private val gameCreationWindow = W_GameCreation()
 
-    private var type = CityType.asian
+    //==========================================
+    //#endregion actors
+    //==========================================
+
+    private val controller = WorldCreationScreenController()
 
     //==========================================
-    //#endregion fields
     //#region operations
     //==========================================
 
@@ -65,33 +69,15 @@ class WorldCreation(val isConnecting : Boolean = false) : ScalingScreenAdapter()
      * # Renders the screen
      */
     override fun render(delta: Float) {
-        // Render once, then on the second frame callback to the game hypervisor to create the game.
-        // We have to perform a full render and return to put a loading screen up.
+        controller.run()
+        with (stage) {
+            batch.begin()
+                SKIN.getDrawable("tiledtex").draw(batch, 0f, 0f, width, height)
+            batch.end()
 
-        // Second part of this test ensures that we outwait any transision screen before the callback.
-        //if (hasRendered && Client.client!!.screen === this) doNewGameCallback()
-
-        if (userFinished && Client.client!!.currentScreen == this)
-            if (!inGame && loadingScreenRendered)
-                doNewGameCallback()
-            else {
-                constructLoadingGUI()
-                loadingScreenRendered = true
-            }
-        else if (isConnecting && !loadingScreenRendered) {
-            renderConnecting()
-            loadingScreenRendered = true
+            act()
+            draw()
         }
-
-        stage.batch.begin()
-        SKIN.getDrawable("tiledtex").draw(stage.batch, 0f, 0f, width, height)
-        stage.batch.end()
-
-        stage.act()
-        stage.draw()
-
-        // For debug, stay on the loading screen if any key is pressed.
-        //if (!Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) hasRendered = true
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
             cancel()
@@ -102,30 +88,29 @@ class WorldCreation(val isConnecting : Boolean = false) : ScalingScreenAdapter()
      */
     private fun nextTip() = tipLabel.setText(Assets.TIPS[MathUtils.random(Assets.TIPS.size - 1)])
 
-    override fun doResize(width: Int, height: Int) {}
+    fun constructLoadingText()    = constructText("specific.gamecreation.generating")
+    fun constructConnectingText() = constructText("!Waiting for host to start game.")
+    private fun constructText(key : String) {
+        with(loadingContainer) {
+        setFillParent(true)
 
-    /**
-     * # Constructs the GUI shown whilst the game is generating
-     */
-    private fun constructLoadingGUI() = loadingText("specific.gamecreation.generating")
-    private fun renderConnecting() = loadingText("!Waiting for host to start game.")
+        StageWindow
+            .label(key, this)
+            .padBottom(50f)
+            .row()
 
-    private fun loadingText(key : String) {
-        val table = Table()
-        table.setFillParent(true)
-
-        // TODO Add other information.
-        StageWindow.label(key, table).padBottom(50f).row()
-
-        //table.add(Label("WIDTH : " + WorldTerrain.DEFAULT_WIDTH, Assets.SKIN)).left().row()
-        //table.add(Label("HEIGHT : " + WorldTerrain.DEFAULT_HEIGHT, Assets.SKIN)).left().row()
-        //table.add(Label("MAX FOLIAGE SPAWNS : " + WorldTerrain.FOLIAGE_QUANTITY_MAX, Assets.SKIN)).left().padBottom(50f).row()
         nextTip()
-        table.add(tipLabel).row()
 
-        stage.clear()
-        stage.addActor(table)
+        add(tipLabel)
+            .row()
+        }
+
+        with(stage) {
+            actors.clear()
+            addActor(loadingContainer)
+        }
     }
+
 
     /**
      * # Cancels the world generation, and returns to the main menu
@@ -139,23 +124,13 @@ class WorldCreation(val isConnecting : Boolean = false) : ScalingScreenAdapter()
     //#endregion operations
     //==========================================
 
-    init {
-        if (Client.DEBUG_MODE) {
-            userFinished = true
-        } else {
 
-            addw(gameCreationWindow)
-
-            Gdx.input.inputProcessor = stage
-        }
-    }
-
-    private fun addw(w : StageWindow) {
+    fun addw(w : StageWindow) {
         stage.addActor(w)
         w.centerStage()
     }
 
-    private inner class W_GameCreation() : StageWindow() {
+    inner class W_GameCreation() : StageWindow() {
         init {
             isResizable = false
             isMovable = false
@@ -182,13 +157,14 @@ class WorldCreation(val isConnecting : Boolean = false) : ScalingScreenAdapter()
                     .padTop(30f)
             )
 
-            span(addButton("generic.game.new") { userFinished = true })
+            span(addButton("generic.game.new") {
+                controller.switchState(1)
+            })
             row()
             span(addButton("!LAN") {
-                if (Server.boot())
-                    addw(W_NetworkConnect())
-                else
-                    dialog("!Not available!", "!Failed to start the server. Is there already one running?")
+                controller.switchState(3)
+//                else TODO
+//                    dialog("!Not available!", "!Failed to start the server. Is there already one running?")
             })
             row()
             span(addButton("generic.buttons.cancel", false) { cancel() })
@@ -197,15 +173,129 @@ class WorldCreation(val isConnecting : Boolean = false) : ScalingScreenAdapter()
         }
     }
 
-    private inner class W_NetworkConnect : StageWindow("!Connect") {
+    private inner class W_NetworkConnect : StageWindow() {
         init {
             label("!HOST IP : ${getIP().hostAddress}")
             row()
             label("!Wait for players, then click start.")
             row()
-            addButton("!Start Game!") { userFinished = true; }
+            addButton("!Start Game!") { GameHypervisor.doNewGameFINAL() }
 
             pack()
         }
     }
+
+
+    /**
+     * # World Creation Screen State Machine.
+     *
+     * Controlls the state of the game loading window.
+     *
+     * Generated using Shinkson's State Machine Scripture.
+     *
+     * See WorldCreation.sms
+     */
+    inner class WorldCreationScreenController : StateMachine("WorldCreationScreenController") {
+        private var framebuffer = 0
+
+        init {
+            // State : GameConfigure
+            addState(State(
+                "GameConfigure",
+                {},
+                this,
+                {
+                    addw(gameCreationWindow)
+                    Gdx.input.inputProcessor = stage
+                },
+                {
+                    if (isConnected()) { constructConnectingText() }
+                    else { constructLoadingText() }
+                }
+            ))
+            // State : PreRender
+            addState(
+                State(
+                    "PreRender",
+                    { framebuffer++ },
+                    this,
+                    null,
+                    null
+                )
+            )
+            // State : GeneratingWorld
+            addState(
+                State(
+                    "GeneratingWorld",
+                    {},
+                    this,
+                    { doNewGameCallback() },
+                    null
+                )
+            )
+            // State : LanInit
+            addState(
+                State(
+                    "LanInit",
+                    {},
+                    this,
+                    { boot() },
+                    null
+                )
+            )
+            // State : LanConfigure
+            addState(
+                State(
+                    "LanConfigure",
+                    {},
+                    this,
+                    {
+                        Gdx.input.inputProcessor = stage
+                        stage.actors.removeValue(loadingContainer, true)
+                        addw(W_NetworkConnect())
+                    },
+                    null
+                )
+            )
+            // State : Complete
+            addState(
+                State(
+                    "Complete",
+                    {},
+                    this,
+                    { GameHypervisor.doNewGameFINAL() },
+                    null
+                )
+            )
+            // State : LanConnecting
+            addState(
+                State(
+                    "LanConnecting",
+                    {},
+                    this,
+                    null,
+                    null
+                )
+            )
+            // Switch : from GameConfigure to PreRender
+            registerSwitchCondition(0, 1) { Client.DEBUG_MODE or isConnected() }
+            // Switch : from PreRender to GeneratingWorld
+            registerSwitchCondition(1, 2) { framebuffer >= 3 && !isConnected() }
+            // Switch : from PreRender to LanConnecting
+            registerSwitchCondition(1, 6) { framebuffer >= 3 && isConnected() }
+            // Switch : from LanInit to GameConfigure
+            registerSwitchCondition(3, 0) { !alive }
+            // Switch : from LanInit to PreRender
+            registerSwitchCondition(3, 1) { alive }
+            // Switch : from GeneratingWorld to LanConfigure
+            registerSwitchCondition(2, 4) { alive }
+            // Switch : from GeneratingWorld to Complete
+            registerSwitchCondition(2, 5) { !alive }
+            // Switch : from LanConnecting to Complete
+            registerSwitchCondition(6, 5) { GameHypervisor.inGame }
+            defaultState(0)
+        }
+    }
+
+    override fun doResize(width: Int, height: Int) {}
 }

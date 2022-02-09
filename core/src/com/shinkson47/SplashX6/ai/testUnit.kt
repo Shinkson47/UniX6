@@ -18,15 +18,15 @@ class testUnit(unitClass: UnitClass, isoVec: Vector3) : com.shinkson47.SplashX6.
 
     private var destsReached = 0
     private val travelCount = MathUtils.random(3)
-    val ai = StateMachine()
+    val ai = StateMachine(this::class.simpleName!!)
 
     init {
         with(ai) {
             // Move
-            addState(State({ UnitActionDictionary.TRAVEL.run(this@testUnit) }, this))
+            addState(State("Move", { UnitActionDictionary.TRAVEL.run(this@testUnit) }, this))
 
             // Choose new destination. Exit script returns to move state.
-            addState(State({ moveOrSettle() }, this, enterScript = { destsReached++; }))
+            addState(State("Action", { moveOrSettle() }, this, enterScript = { destsReached++; }))
 
             // Once we've reached our destination, switch to second state.
             registerSwitchCondition(0, 1) { pathNodes?.size == 0 }

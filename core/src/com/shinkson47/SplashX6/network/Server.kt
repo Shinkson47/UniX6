@@ -1,11 +1,15 @@
 package com.shinkson47.SplashX6.network
 
+import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.game.GameData
+import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.BindException
 import java.net.ServerSocket
 import java.net.Socket
+import java.net.SocketException
+import java.util.function.Predicate
 
 
 /**
@@ -37,6 +41,7 @@ object Server {
         lateinit var _clientSocket : Socket
         lateinit var _clientInput  : ObjectInputStream
         lateinit var _clientOutput : ObjectOutputStream
+        var dirty : Boolean = false
         var running : Boolean = true
 
         fun isConnected() = this::_clientSocket.isInitialized && _clientSocket.isConnected
@@ -67,7 +72,10 @@ object Server {
          * # Sends the status of the game to the client.
          */
         fun status() {
-            send(Packet(PacketType.Status, GameData))
+            if (Client.client!!.currentScreen is GameScreen)
+                send(Packet(PacketType.Start, GameData))
+            else
+                send(Packet(PacketType.Status, GameData))
         }
 
         fun send(packet: Packet) {
@@ -107,8 +115,16 @@ object Server {
     }
 
     fun shutdown()  {
-        if (alive)
+        if (alive) {
+            alive = false
+            socket.close()
+
             socketConnections.forEach { it.stop() }
+            socketConnections.clear()
+
+            socketConnectionThreads.forEach { it.stop() }
+            socketConnectionThreads.clear()
+        }
         printStatus()
     }
 
@@ -163,7 +179,11 @@ object Server {
 
     fun sendToAllClients(pkt : Packet) {
         socketConnections.forEach {
-            it.send(pkt)
+            try {
+                it.send(pkt)
+            } catch (e : SocketException) { it.dirty }
         }
+
+        socketConnections.removeIf { it.dirty }
     }
 }

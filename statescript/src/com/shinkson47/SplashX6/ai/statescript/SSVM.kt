@@ -31,6 +31,7 @@ object SSVM {
 
     val constructor = MethodSpec.constructorBuilder()
 
+    private val imports = ArrayList<StateScriptParser.ImportDeclarationContext>();
     private val knownStates = ArrayList<String>();
     lateinit var fileString : String
     lateinit var name : String
@@ -93,7 +94,7 @@ object SSVM {
         // Post save code injection. Dodgy work around.
         // Reload the exported file, drop the curly bracket,
         // inject the code blocks, replace the bracket, save again.
-        println("Modifying file : injecting code blocks and test main.")
+        println("Modifying file with things that can't be done with JavaPoet (injecting code blocks, imports and test main.)")
         var fileContents = file.toFile().readText(UTF_8)
         fileContents = fileContents.dropLast(2)
         fileContents += "$code\n"
@@ -104,12 +105,20 @@ object SSVM {
                 "\t\tnew ${name}().run(100);\n" +
                 "\t}\n}"
 
+        val imps = StringBuffer("\n")
+        imports.forEach { imps.append((it.text + "\n").replace(Regex("import"), "import ")) }
+
+        fileContents =
+            StringBuffer(fileContents)
+            .insert(fileContents.indexOf("import com.shinkson47.SplashX6.ai.StateMachine;"), imps.toString())
+            .toString()
+
         file.writeText(fileContents, UTF_8)
         println("output : ${file.toAbsolutePath()}")
     }
 
     @JvmStatic
-    fun addState(name : String, behaviour: StateScriptParser.BehaviourContext, enterScript: StateScriptParser.EnterScriptContext?, exitScript: StateScriptParser.ExitScriptContext?) {
+    fun addState(name : String, behaviour: StateScriptParser.BehaviourContext?, enterScript: StateScriptParser.EnterScriptContext?, exitScript: StateScriptParser.ExitScriptContext?) {
         println("Compiling state '$name'.")
 
         knownStates.add(name)
@@ -117,7 +126,8 @@ object SSVM {
 
         constructor.addStatement("""
             addState(new State(
-                () -> ${origionalText(behaviour.block())},
+                "$name",
+                () -> ${origionalText(behaviour?.block())},
                 this,
                 ${if (enterScript == null) "null" else "() -> ${enterScript.block().text}"},
                 ${if (exitScript  == null) "null" else "() -> ${exitScript.block().text}"}
@@ -132,6 +142,8 @@ object SSVM {
         SSVM.name = name
         output = TypeSpec.classBuilder(name)
             .superclass(StateMachine::class.java)
+
+        constructor.addStatement("super(\"$name\")")
 
         addClassJavadoc("<h1>$name</h1>\n")
     }
@@ -150,7 +162,7 @@ object SSVM {
 
     @JvmStatic
     fun addSwitch(ctx: StateScriptParser.SwitchStateContext) {
-        println("Added a state switch condition.")
+        println("Added a state switch condition. (from ${ctx.Identifier(0)} to ${ctx.Identifier(1)})")
         constructor.addComment("Switch : from ${ctx.Identifier(0)} to ${ctx.Identifier(1)}")
         constructor.addStatement("registerSwitchCondition(${knownStates.indexOf(ctx.Identifier(0).toString())}, ${knownStates.indexOf(ctx.Identifier(1).toString())}, unit -> ${if (ctx.IF() != null) strip(
             origionalText(ctx.parExpression())
@@ -159,11 +171,18 @@ object SSVM {
 
     private fun strip(string : String): String = string.drop(1).dropLast(1)
 
-    private fun origionalText(behaviour : ParserRuleContext) : String
-        = behaviour.start.inputStream.getText(Interval(behaviour.start.getStartIndex(), behaviour.stop.getStopIndex()));
+    private fun origionalText(behaviour : ParserRuleContext?) : String
+        = if (behaviour != null) {
+            behaviour.start.inputStream.getText(Interval(behaviour.start.getStartIndex(), behaviour.stop.getStopIndex()))
+        } else "{}"
 
     @JvmStatic fun setDefaultState(ctx: StateScriptParser.DefaultStateContext) {
         defaultState = ctx.Identifier().text
         println("Set default state to '$defaultState'.")
+    }
+
+    @JvmStatic
+    fun addImport(ctx: StateScriptParser.ImportDeclarationContext) {
+        imports.add(ctx)
     }
 }

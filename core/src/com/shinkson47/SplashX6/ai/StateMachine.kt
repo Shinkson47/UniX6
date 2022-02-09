@@ -18,7 +18,7 @@ import java.util.function.Predicate
  * @since PRE-ALPHA 0.0.3
  * @version 1
  */
-open class StateMachine : Runnable {
+open class StateMachine(val name: String) : Runnable {
 
     /**
      * # All states in this state machine.
@@ -70,6 +70,8 @@ open class StateMachine : Runnable {
         if (!this::currentState.isInitialized) {
             defaultState = state
             forceState(defaultState)
+            currentState.enter()
+            print("defaulted to $state")
         } else
             throw IllegalStateException("This machine is already in a state!")
     }
@@ -139,12 +141,16 @@ open class StateMachine : Runnable {
      *
      */
     private fun switchState(newState: StateMachine.State) {
-        println("Switch state $currentState to $newState")
+        print("Switch state $currentState to $newState")
         checkStateExists(newState)
 
         currentState.exit()
         currentState = newState
         newState.enter()
+    }
+
+    private fun print(m : String) {
+        println("[State Machine '$name' $m]")
     }
 
     /**
@@ -157,6 +163,7 @@ open class StateMachine : Runnable {
      * to determine if the system should swich states.
      */
     inner class State(
+        val name: String,
         private val script : Runnable,
         val parent : StateMachine,
 
@@ -199,19 +206,14 @@ open class StateMachine : Runnable {
                 }
             }
         }
-    }
-
-
-    companion object {
 
         /**
-         * # An object which has underlying statemachine behaviours.
-         *
-         * Just an alias for a [StateMachine], but reads nicer when implementing.
+         * Returns a string representation of the object.
          */
-        abstract class StateObject : StateMachine()
+        override fun toString(): String {
+            return name
+        }
     }
-
 
     // ===============================================
     //# endregion companion
@@ -221,12 +223,12 @@ open class StateMachine : Runnable {
 }
 
     fun main() {
-        val machine = StateMachine()
+        val machine = StateMachine("Counting Test Machine")
         var i = 0
 
         with (machine) {
-            addState(State({i++}, this,  enterScript = { println("Enter ++") } ))
-            addState(State({i--}, this,  enterScript = { println("Enter --") } ))
+            addState(State("plus", {i++}, this,  enterScript = { println("Enter ++") } ))
+            addState(State("minus", {i--}, this,  enterScript = { println("Enter --") } ))
 
             defaultState(0)
 

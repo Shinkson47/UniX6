@@ -161,7 +161,10 @@ public class SSVMListener extends StateScriptBaseListener {
 	@Override public void exitPackageDeclaration(StateScriptParser.PackageDeclarationContext ctx) { }
 
 
-
+	@Override
+	public void enterImportDeclaration(StateScriptParser.ImportDeclarationContext ctx) {
+		SSVM.addImport(ctx);
+	}
 
 	/**
 	 * {@inheritDoc}
