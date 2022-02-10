@@ -115,16 +115,16 @@ object Server {
     }
 
     fun shutdown()  {
-        if (alive) {
-            alive = false
-            socket.close()
+        if (!alive) return
 
-            socketConnections.forEach { it.stop() }
-            socketConnections.clear()
+        alive = false
+        socket.close()
 
-            socketConnectionThreads.forEach { it.stop() }
-            socketConnectionThreads.clear()
-        }
+        socketConnections.forEach { it.stop() }
+        socketConnections.clear()
+
+        socketConnectionThreads.forEach { it.stop() }
+        socketConnectionThreads.clear()
         printStatus()
     }
 
