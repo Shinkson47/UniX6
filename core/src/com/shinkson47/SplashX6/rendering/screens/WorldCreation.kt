@@ -195,7 +195,7 @@ class WorldCreation(
             })
             row()
             span(addButton("!LAN") {
-                controller.switchState(3)
+                controller.switchState(4)
 //                else TODO
 //                    dialog("!Not available!", "!Failed to start the server. Is there already one running?")
             })
