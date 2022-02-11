@@ -196,7 +196,7 @@ class WorldCreation(
             )
 
             span(addButton("generic.game.new") {
-                controller.switchState(1)
+                controller.switchState(2)
             })
             row()
             span(addButton("!LAN") {
