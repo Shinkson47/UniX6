@@ -38,18 +38,27 @@ a window, and configures the game's settings.
 */
 state GameConfigure {
 	enter {
-	    addw(gameCreationWindow);
+	    chooser.show(stage);
         Gdx.input.inputProcessor = stage;
 	}
 
 	exit {
-		if (NetworkClient.isConnected()) {
+		if (isConnecting) {
 			constructConnectingText();
+		} else if (isDeserializing | isLoading) {
+			constructDeserializingText();
 		} else {
-			constructLoadingText();
+			constructGeneratingText();
 		}
 	}
 }
+
+state GameLoad {
+	enter {
+		addw(chooser);
+	}
+}
+switch from GameConfigure to GameLoad if (isLoading);
 
 
 /**
@@ -65,6 +74,18 @@ code {
 	private int framebuffer = 0;
 }
 state PreRender {
+	enter {
+		framebuffer = 0;
+
+		if (isConnecting) {
+			constructConnectingText();
+		} else if (isConnecting ||isDeserializing || isLoading) {
+			constructDeserializingText();
+		} else {
+			constructGeneratingText();
+		}
+	}
+
 	behaviour {
 		framebuffer++;
 	}
@@ -116,6 +137,25 @@ state LanConfigure {
 }
 
 
+code {
+	private boolean isDeserializing = false;
+}
+state Deserializing {
+	enter {
+		if (isLoading)
+			GameHypervisor.load(Gdx.files.external(chooser.result.path()).file());
+		else {
+			NetworkClient.postUpdate();
+			if (NetworkClient.INSTANCE.getLastState().getGameState() == null)Gdx.app.postRunnable { load(NetworkClient.INSTANCE.getLastState().getGameState()); }
+		}
+	}
+
+	exit {
+		isDeserializing = true;
+	}
+}
+
+
 
 state Complete {
 	enter {
@@ -131,16 +171,17 @@ state Complete {
 
 */
 state LanConnecting {
-	behaviour {
-
+	enter {
+		NetworkClient.connect();
 	}
 }
 
 
-switch from GameConfigure to PreRender if (Client.DEBUG_MODE | NetworkClient.isConnected());
+switch from GameConfigure to PreRender if (Client.DEBUG_MODE | isConnecting);
 
-switch from PreRender to GeneratingWorld if (framebuffer >= 3 && !NetworkClient.isConnected());
-switch from PreRender to LanConnecting if (framebuffer >= 3 && NetworkClient.isConnected());
+switch from PreRender to Deserializing if (framebuffer >= 3 && isDeserializing );
+switch from PreRender to GeneratingWorld if (framebuffer >= 3 && !isConnecting && !isDeserializing );
+switch from PreRender to LanConnecting if (framebuffer >= 3 && isConnecting);
 
 // If the server failed to start server, return to GameConfiguration.
 // TODO notify user.
@@ -150,6 +191,7 @@ switch from LanInit to PreRender if (Server.INSTANCE.getAlive());
 switch from GeneratingWorld to LanConfigure if (Server.INSTANCE.getAlive());
 switch from GeneratingWorld to Complete if (!Server.INSTANCE.getAlive());
 
-switch from LanConnecting to Complete if (GameHypervisor.inGame);
+switch from LanConnecting to PreRender if (GameHypervisor.inGame);
 
+switch from Deserializing to Complete;
 // TODO I'd really like to add an 'else' case to these switch statements.

@@ -1,8 +1,11 @@
 package com.shinkson47.SplashX6.game.cities
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.MathUtils
 import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.game.units.UnitClass
 import com.shinkson47.SplashX6.utility.TurnHook
+import com.shinkson47.SplashX6.utility.Utility
 import com.shinkson47.SplashX6.utility.UtilityK.tryOrNull
 import java.io.Serializable
 
@@ -24,14 +27,20 @@ class Production(val forCity: City) : TurnHook, Serializable {
      */
     val queue :  ArrayList<ProductionProject> = arrayListOf()
 
-    var productionPower : Int = BASE_PRODUCTION_POWER
+    var productionPower : Int = BASE_PRODUCTION_POWER + (BASE_PRODUCTION_POWER * forCity.population)
         private set
+        get() {
+            field = BASE_PRODUCTION_POWER + (BASE_PRODUCTION_POWER * forCity.population)
+            return field
+        }
 
     fun queue(project : ProductionProject) {
-        if (queue.size >= QUEUE_LIMIT) return
+        if (isQueuefull()) return
         queue.add(project)
         project.assign(this)
     }
+
+    fun isQueuefull() = queue.size >= QUEUE_LIMIT
 
     fun evaluateCitiesProductionPower () {}
 
@@ -75,7 +84,7 @@ class Production(val forCity: City) : TurnHook, Serializable {
      * # A project that can be completed by a city.
      */
     abstract class ProductionProject(
-        val cost: Int = 15,
+        val cost: Int = MathUtils.random(1, 20),
         var progress: Int = 0
     ) {
 

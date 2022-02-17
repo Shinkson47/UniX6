@@ -2,14 +2,15 @@ package com.shinkson47.SplashX6.network
 
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.game.GameData
+import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.lang.Exception
 import java.net.BindException
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
-import java.util.function.Predicate
 
 
 /**
@@ -56,15 +57,10 @@ object Server {
             onClientConnect()
             status()
             newSocketThread()
-//
-//            while (running) {
-//
-//            }
         }
 
         fun stop() {
             running = false
-
             onClientDisconnect()
         }
 
@@ -72,15 +68,25 @@ object Server {
          * # Sends the status of the game to the client.
          */
         fun status() {
-            if (Client.client!!.currentScreen is GameScreen)
+            if (Client.client!!.screen is GameScreen)
                 send(Packet(PacketType.Start, GameData))
             else
                 send(Packet(PacketType.Status, GameData))
         }
 
         fun send(packet: Packet) {
-            if (isConnected())
-                Packet.send(packet, _clientInput, _clientOutput)
+            if (isConnected()) {
+                while (true) {
+                    Packet.send(packet, _clientInput, _clientOutput)
+                    val response = read()
+                    if (response.type != PacketType.Resend)
+                        break
+                }
+            }
+        }
+
+        fun read() : Packet {
+            return _clientInput.readObject() as Packet
         }
     }
 
@@ -115,16 +121,16 @@ object Server {
     }
 
     fun shutdown()  {
-        if (alive) {
-            alive = false
-            socket.close()
+        if (!alive) return
 
-            socketConnections.forEach { it.stop() }
-            socketConnections.clear()
+        alive = false
+        socket.close()
 
-            socketConnectionThreads.forEach { it.stop() }
-            socketConnectionThreads.clear()
-        }
+        socketConnections.forEach { it.stop() }
+        socketConnections.clear()
+
+        socketConnectionThreads.forEach { it.stop() }
+        socketConnectionThreads.clear()
         printStatus()
     }
 

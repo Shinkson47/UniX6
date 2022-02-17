@@ -1,20 +1,17 @@
 package com.shinkson47.SplashX6.rendering.windows.game
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.badlogic.gdx.utils.Align
 import com.shinkson47.SplashX6.game.GameData
+import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.game.cities.City
 import com.shinkson47.SplashX6.game.cities.Production
-import com.shinkson47.SplashX6.game.units.Unit
-import com.shinkson47.SplashX6.game.units.UnitAction
 import com.shinkson47.SplashX6.rendering.StageWindow
-import com.shinkson47.SplashX6.utility.Assets
 import com.shinkson47.SplashX6.utility.Assets.SKIN
-import com.shinkson47.SplashX6.utility.Utility
-import com.shinkson47.SplashX6.utility.Utility.CollectionToGDXArray
-import com.shinkson47.SplashX6.utility.Utility.local
+import com.shinkson47.SplashX6.utility.Utility.*
 
 /**
  * # Displays and manages the player's settlements and thier prouction within
@@ -35,22 +32,39 @@ class W_Settlements : StageWindow("generic.game.settlements") {
     private val lblCityProductionPower : Label
     private val lblCost                = Label("0", SKIN)
     private val lblCompleteIn          = Label("0", SKIN)
+    private val lblCityProductionPowerLevel = Label("100", SKIN)
+    private var btnAddButton: Button
 
 
     init {
+        padLeft(5f)
+
         queue.selection.required = false
         production.selection.required = false
 
+        listListener(production)
+        listListener(queue)
+
         setPosition(0f, Gdx.graphics.height.toFloat())
 
-        cities.addListener(LambdaChangeListener { refresh() })
+        label("specific.windows.settlements.cities")
+            .fill()
+            .actor.setAlignment(Align.left)
+
+        cities.addListener(LambdaChangeListener {
+            selectedCity()?.let { GameHypervisor.camera_focusOn(it) }
+            refresh()
+        })
+
         add(cities)
-            .colspan(3)
+            .colspan(2)
             .fillX()
             .expandX()
             .row()
 
-        label("specific.windows.settlements.productionPower").also { lblCityProductionPower = it.actor }
+        label("specific.windows.settlements.productionPower")
+            .also { lblCityProductionPower = it.actor }
+        add(lblCityProductionPowerLevel)
         row()
 
         label("specific.windows.settlements.available")
@@ -72,20 +86,46 @@ class W_Settlements : StageWindow("generic.game.settlements") {
             .maxHeight(500f)
         )
 
-        var v : WidgetGroup = VerticalGroup()
-        v.addActor(TextButton(local("generic.any.add"), SKIN).also { it.addListener(LambdaClickListener {
-            production.selected?.let { cities.selected?.production!!.queue(it) }
+        val midColumn : WidgetGroup = VerticalGroup()
+        midColumn.addActor(TextButton(local("generic.any.add"), SKIN)
+                .also {
+                    it.addListener {
+                        if (selectedProduction().isQueuefull())
+                            message("!Queue for this city is full.")
+                        false
+                    }
+
+                    it.addListener(LambdaClickListener {
+                        var index = -1
+                        selectedInAvailable()?.let {
+                            selectedProduction().queue(it)
+                            index = production.selectedIndex
+                        }
+                        refresh()
+
+                        if (index != -1)
+                            production.selectedIndex = index
+                    })
+                    btnAddButton = it
+                }
+        )
+
+
+        val localisedLabel: (key: String) -> Unit = {
+            midColumn.addActor(Label(local(it), SKIN))
+        }
+
+        localisedLabel("specific.windows.settlements.cost")
+        midColumn.addActor(lblCost)
+
+        localisedLabel("specific.windows.settlements.completeIn")
+        midColumn.addActor(lblCompleteIn)
+
+        midColumn.addActor(TextButton(local("generic.any.remove"), SKIN).apply { addListener(LambdaClickListener {
+            selectedInQueue().let { selectedProduction().queue.remove(it) }
             refresh()
-        } )})
-
-
-        v.addActor(Label(local("specific.windows.settlements.cost"), SKIN))
-        v.addActor(lblCost)
-
-        v.addActor(Label(local("specific.windows.settlements.completeIn"), SKIN))
-        v.addActor(lblCompleteIn)
-        v.addActor(TextButton(local("generic.any.remove"), SKIN))
-        expandfill(add(v))
+        })})
+        expandfill(add(midColumn))
 
         expandfill(add(ScrollPane(queue, SKIN))
             .minWidth(150f)
@@ -95,20 +135,49 @@ class W_Settlements : StageWindow("generic.game.settlements") {
         refresh()
         pack()
     }
+    
+    private fun listListener(l: List<Production.ProductionProject>): Boolean {
+        l.selected?.let { refreshCost(it); return true }
+        return false
+    }
 
     override fun refresh() {
-        cities.setItems(CollectionToGDXArray(GameData.player!!.cities))
+        cities.items = CollectionToGDXArray(GameData.player!!.cities)
 
-        cities.selected?.let { refresh(queue.items, it.production.queue) }
-
+        selectedCity()?.let { refresh(queue.items, it.production.queue) }
         queue.selection.validate()
 
-        cities.selected?.let { refresh(production.items, it.production.producable()) }
+        selectedCity()?.let { refresh(production.items, it.production.producable()) }
         production.selection.validate()
+
+        selectedCity()?.let { lblCityProductionPowerLevel.setText(it.production.productionPower) }
     }
+
+    private fun refreshCost(it : Production.ProductionProject?) {
+        lblCost.setText(if (it == null) "0" else "${it.cost}")
+        lblCompleteIn.setText(if (it == null) "0" else "${it.cost / cities.selected.production.productionPower}")
+    }
+
+
+
 
     private fun <T> refresh(list :  com.badlogic.gdx.utils.Array<T>, data : Collection<T>) {
         list.clear()
         list.addAll(CollectionToGDXArray(data))
+        selectedCity()?.let { btnAddButton.touchable = if (it.production.isQueuefull()) Touchable.disabled else Touchable.enabled }
     }
+
+    private fun selectedInQueue(): Production.ProductionProject? =
+        queue.selected
+
+    private fun selectedInAvailable(): Production.ProductionProject? =
+        production.selected
+
+    private fun selectedCity(): City? =
+        cities.selected
+
+    private fun selectedProduction(): Production =
+        selectedCity()?.production!!
+
+
 }
