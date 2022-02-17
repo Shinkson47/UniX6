@@ -234,6 +234,7 @@ class GameHypervisor {
          */
         @JvmStatic
         fun update(newData: _GameData) {
+            if (!inGame) return
             GameData = newData
             GameData.deserialize()
             gameRenderer!!.newRenderer()
@@ -490,6 +491,12 @@ class GameHypervisor {
         //#region camera control
         //========================================================================
 
+
+        /**
+         * # Focusses the camera on the provided unit.
+         */
+        @JvmStatic
+        fun camera_focusOn(city: City) = camera_focusOn(city.getPosition())
 
         /**
          * # Focusses the camera on the provided unit.
