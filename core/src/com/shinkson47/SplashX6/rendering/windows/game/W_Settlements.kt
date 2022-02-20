@@ -90,15 +90,17 @@ class W_Settlements : StageWindow("generic.game.settlements") {
         midColumn.addActor(TextButton(local("generic.any.add"), SKIN)
                 .also {
                     it.addListener {
-                        if (selectedProduction().isQueuefull())
-                            message("!Queue for this city is full.")
-                        false
-                    }
+                        selectedProduction()?.let {
+                                if (it.isQueuefull())
+                                    message("!Queue for this city is full.")
+                            }
+                            false
+                        }
 
                     it.addListener(LambdaClickListener {
                         var index = -1
                         selectedInAvailable()?.let {
-                            selectedProduction().queue(it)
+                            selectedProduction()?.queue(it)
                             index = production.selectedIndex
                         }
                         refresh()
@@ -122,7 +124,7 @@ class W_Settlements : StageWindow("generic.game.settlements") {
         midColumn.addActor(lblCompleteIn)
 
         midColumn.addActor(TextButton(local("generic.any.remove"), SKIN).apply { addListener(LambdaClickListener {
-            selectedInQueue().let { selectedProduction().queue.remove(it) }
+            selectedInQueue().let { selectedProduction()?.queue?.remove(it) }
             refresh()
         })})
         expandfill(add(midColumn))
@@ -137,7 +139,7 @@ class W_Settlements : StageWindow("generic.game.settlements") {
     }
     
     private fun listListener(l: List<Production.ProductionProject>): Boolean {
-        l.selected?.let { refreshCost(it); return true }
+        l.addListener(LambdaClickListener { l.selected?.let { refreshCost(it);}})
         return false
     }
 
@@ -176,8 +178,8 @@ class W_Settlements : StageWindow("generic.game.settlements") {
     private fun selectedCity(): City? =
         cities.selected
 
-    private fun selectedProduction(): Production =
-        selectedCity()?.production!!
+    private fun selectedProduction(): Production? =
+        selectedCity()?.production
 
 
 }
