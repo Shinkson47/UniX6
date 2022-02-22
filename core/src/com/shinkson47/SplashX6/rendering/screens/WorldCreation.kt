@@ -32,7 +32,6 @@
 
 package com.shinkson47.SplashX6.rendering.screens
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.MathUtils
@@ -40,17 +39,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.gdx.musicevents.tool.file.FileChooser
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.ai.StateMachine
-import com.shinkson47.SplashX6.game.Civilisation
+import com.shinkson47.SplashX6.game.Nation
 import com.shinkson47.SplashX6.game.GameData
 import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.doNewGameCallback
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.inGame
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.load
 import com.shinkson47.SplashX6.game.NationType
-import com.shinkson47.SplashX6.game.cities.CityType
 import com.shinkson47.SplashX6.game.world.generation.GenerationCompanion
-import com.shinkson47.SplashX6.game.world.generation.Generator
-import com.shinkson47.SplashX6.game.world.generation.WorldGenerationStage
 import com.shinkson47.SplashX6.network.NetworkClient
 import com.shinkson47.SplashX6.network.NetworkClient.connect
 import com.shinkson47.SplashX6.network.Server
@@ -64,7 +59,6 @@ import com.shinkson47.SplashX6.utility.Assets.SKIN
 import com.shinkson47.SplashX6.utility.UtilityK.getIP
 import java.io.InvalidClassException
 import java.net.ConnectException
-import java.util.function.Consumer
 
 
 /**
@@ -235,12 +229,12 @@ class WorldCreation(
             add(x)
 
             row();
-            val lblLegend = label("!" + Civilisation.legend(GameData.pref_civType)).actor as Label
+            val lblLegend = label("!" + Nation.legend(GameData.pref_civType)).actor as Label
 
             //TODO i don't like this varialbe thingy
             x.addListener(LambdaChangeListener {
                 GameData.pref_civType = x.selected
-                lblLegend.setText(Civilisation.legend(x.selected))
+                lblLegend.setText(Nation.legend(x.selected))
                 pack()
                 centerStage()
             })

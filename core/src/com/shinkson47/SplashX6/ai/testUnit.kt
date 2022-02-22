@@ -50,10 +50,8 @@ class testUnit(unitClass: UnitClass, isoVec: Vector3) : com.shinkson47.SplashX6.
 
     private var destsReached = 0
     private val travelCount = MathUtils.random(3)
-    val ai = StateMachine(this::class.simpleName!!)
-
-    init {
-        with(ai) {
+    val ai = object : StateMachine(this::class.simpleName!!) {
+        init {
             // Move
             addState(State("Move", { UnitActionDictionary.TRAVEL.run(this@testUnit) }, this))
 
