@@ -55,7 +55,8 @@ import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
 import com.shinkson47.SplashX6.rendering.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
 import com.shinkson47.SplashX6.utility.Assets
-import com.shinkson47.SplashX6.utility.Assets.SKIN
+import com.shinkson47.SplashX6.utility.Assets.LANG_TIPS
+import com.shinkson47.SplashX6.utility.Assets.REF_SKIN_W95
 import com.shinkson47.SplashX6.utility.UtilityK.getIP
 import java.io.InvalidClassException
 import java.net.ConnectException
@@ -94,7 +95,7 @@ class WorldCreation(
      */
     private val gameCreationWindow = W_GameCreation()
 
-    private val chooser = FileChooser.createPickDialog("Choose save file", SKIN, Gdx.files.external("/"))
+    private val chooser = FileChooser.createPickDialog("Choose save file", REF_SKIN_W95, Gdx.files.external("/"))
 
     init {
         chooser.setResultListener { success, result ->
@@ -134,7 +135,7 @@ class WorldCreation(
         controller.run()
         with(stage) {
             batch.begin()
-            SKIN.getDrawable("tiledtex").draw(batch, 0f, 0f, width, height)
+            REF_SKIN_W95.getDrawable("tiledtex").draw(batch, 0f, 0f, width, height)
             batch.end()
 
             act()
@@ -148,7 +149,7 @@ class WorldCreation(
     /**
      * # Displays another random tip from [Assets.TIPS] in [tipLabel].
      */
-    private fun nextTip() = tipLabel.setText(Assets.TIPS[MathUtils.random(Assets.TIPS.size - 1)])
+    private fun nextTip() = Assets.get<ArrayList<String>>(LANG_TIPS).let { tipLabel.setText(it[MathUtils.random(it.size - 1)]) }
 
     fun constructGeneratingText() = constructText("specific.gamecreation.generating")
     fun constructDeserializingText() = constructText("!Loading world. Please wait.")
@@ -170,7 +171,7 @@ class WorldCreation(
                 .padBottom(50f)
                 .row()
 
-            tipLabel = Label("", SKIN)
+            tipLabel = Label("", REF_SKIN_W95)
             nextTip()
             add(tipLabel)
         }
@@ -214,7 +215,7 @@ class WorldCreation(
 
             label("!Seed").left()
 
-            add(TextField("seed", SKIN)
+            add(TextField("seed", REF_SKIN_W95)
                 .apply { addListener { GenerationCompanion.SEED = text.hashCode(); true } }
             )
 
@@ -223,7 +224,7 @@ class WorldCreation(
             row()
             label("specific.gamecreation.civtype").left()
 
-            val x = SelectBox<NationType>(SKIN)
+            val x = SelectBox<NationType>(REF_SKIN_W95)
             x.setItems(*NationType.values())
             x.selected = x.items.first()
             add(x)
