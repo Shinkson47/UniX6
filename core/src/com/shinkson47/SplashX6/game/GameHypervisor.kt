@@ -350,7 +350,7 @@ class GameHypervisor {
                 throw IllegalArgumentException("Tried to select a unit that does not exist in the game data!")
 
             GameData.selectedUnit = unit
-            unit_view();
+            unit_view()
         }
 
         /**
