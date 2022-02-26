@@ -1,5 +1,40 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░   ____           ___                  ___             ____      ___    ,6P                                                                                                     ░
+ ░  6MMMMb\         `MM                  `MM             `MM(      )M'  6MM'                                                                                                      ░
+ ░ 6M'    `          MM                   MM              `MM.     d'  6M'                                                                                                        ░
+ ░ MM      __ ____   MM    ___     ____   MM  __           `MM.   d'  6M ____                                                                                                     ░
+ ░ YM.     `M6MMMMb  MM  6MMMMb   6MMMMb\ MM 6MMb           `MM. d'   MMMMMMMb                                                                                                    ░
+ ░  YMMMMb  MM'  `Mb MM 8M'  `Mb MM'    ` MMM9 `Mb           `MMd     MM'   `Mb                                                                                                   ░
+ ░      `Mb MM    MM MM     ,oMM YM.      MM'   MM            dMM.    MM     MM                                                                                                   ░
+ ░       MM MM    MM MM ,6MM9'MM  YMMMMb  MM    MM           d'`MM.   MM     MM                                                                                                   ░
+ ░       MM MM    MM MM MM'   MM      `Mb MM    MM          d'  `MM.  MM     MM                                                                                                   ░
+ ░ L    ,M9 MM.  ,M9 MM MM.  ,MM L    ,MM MM    MM         d'    `MM. YM.   ,M9                                                                                                   ░
+ ░ MYMMMM9  MMYMMM9 _MM_`YMMM9'YbMYMMMM9 _MM_  _MM_      _M(_    _)MM_ YMMMMM9                                                                                                    ░
+ ░          MM                                                                                                                                                                    ░
+ ░          MM                                                                                                                                                                    ░
+ ░         _MM_                                                                                                                                                                   ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
+
+
 package com.shinkson47.SplashX6.game.world
 
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet
@@ -9,12 +44,15 @@ import com.shinkson47.SplashX6.game.GameHypervisor.Companion.spawn
 import com.shinkson47.SplashX6.game.units.UnitClass
 import com.shinkson47.SplashX6.game.world.generation.stages.NavigationDataMiscStage
 import com.shinkson47.SplashX6.utility.Assets
-import com.shinkson47.SplashX6.utility.Assets.hitTest
+import com.shinkson47.SplashX6.utility.Assets.TEX_HITTEST
+import com.shinkson47.SplashX6.utility.Assets.TILED_TILESETS
+import com.shinkson47.SplashX6.utility.Assets.TILED_TILESETS_DATA
 import com.shinkson47.SplashX6.utility.PartiallySerializable
 import com.shinkson47.SplashX6.utility.Utility
 import org.xguzm.pathfinding.gdxbridge.NavigationTiledMapLayer
 import org.xguzm.pathfinding.grid.GridCell
 import org.xguzm.pathfinding.grid.finders.AStarGridFinder
+import java.awt.image.BufferedImage
 import java.io.Serializable
 import java.util.function.Consumer
 import kotlin.math.floor
@@ -39,8 +77,6 @@ class WorldTerrain(val width : Int, val height : Int) : TiledMap(), PartiallySer
     //==============================================
     //#region fields
     //==============================================
-
-    val seed = 1L
 
 
     //#region layers
@@ -172,7 +208,7 @@ class WorldTerrain(val width : Int, val height : Int) : TiledMap(), PartiallySer
             tileSets.removeTileSet(o)
         })
         // Copy all tilesets over to the map.
-        Assets.TILESETS.tileSets.forEach(Consumer { o: TiledMapTileSet? ->
+        Assets.get<TiledMap>(TILED_TILESETS).tileSets.forEach(Consumer { o: TiledMapTileSet? ->
             tileSets.addTileSet(o)
         })
     }
@@ -199,7 +235,7 @@ class WorldTerrain(val width : Int, val height : Int) : TiledMap(), PartiallySer
      */
     private fun createCell(tileName: String, x: Int, y: Int, layer: TiledMapTileLayer) {
         val c = TiledMapTileLayer.Cell()
-        c.tile = tileSets.getTile(Assets.TILESET_MAP[tileName] as Int)
+        c.tile = tileSets.getTile(Assets.get<HashMap<String, Any>>(TILED_TILESETS_DATA)[tileName] as Int)
         layer.setCell(x, y, c)
     }
 
@@ -355,9 +391,6 @@ class WorldTerrain(val width : Int, val height : Int) : TiledMap(), PartiallySer
          */
         const val SEA_LEVEL = 0f
 
-        const val HILL_LEVEL = 0.9f
-        const val MOUNTAIN_LEVEL = 0.97f
-
         /**
          * # The smallest permitted world width
          */
@@ -384,6 +417,8 @@ class WorldTerrain(val width : Int, val height : Int) : TiledMap(), PartiallySer
         const val FOLIAGE_QUANTITY_MAX = 50000
 
         private var hittestResult = 0
+        private val hitTest = Assets.get<BufferedImage>(TEX_HITTEST)
+
         /**
          * <h2>(Badly) Converts WORLD SPACE co-ordinates to map space co-ordinates</h2>
          * Look, he's trying his best - alright?

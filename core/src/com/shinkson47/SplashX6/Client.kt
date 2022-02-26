@@ -1,3 +1,35 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6
 
 import com.badlogic.gdx.Game
@@ -11,7 +43,6 @@ import com.shinkson47.SplashX6.input.mouse.MouseHandler
 import com.shinkson47.SplashX6.rendering.screens.ScreenTransistion
 import com.shinkson47.SplashX6.rendering.screens.SplashScreen
 import com.shinkson47.SplashX6.rendering.screens.WorldCreation
-import com.shinkson47.SplashX6.test.ReleaseTest
 import com.shinkson47.SplashX6.utility.Assets
 import com.shinkson47.SplashX6.utility.Debug
 import com.shinkson47.SplashX6.utility.GraphicalConfig
@@ -50,8 +81,8 @@ class Client : Game() {
      * Skips and configures things which annoy us when we're debugging.
      */
     private fun debugStart() {
-        Assets.Create()
-        AudioController.muteAudio()             // Mute music
+        Assets.finishLoading()
+        AudioController.isMuted = true
         setScreen(WorldCreation())              // Skip to world creation
         GraphicalConfig.exitFullscreen()        // Exit fullscreen so we can access the ide.
     }
@@ -95,6 +126,7 @@ class Client : Game() {
         //World.dispose()
         //AudioManager.dispose();
         Debug.dispose()
+        Assets.dispose()
     }
 
     override fun setScreen(screen: Screen?) {

@@ -1,3 +1,35 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6.audio
 
 import com.badlogic.gdx.utils.Array
@@ -6,7 +38,6 @@ import com.shinkson47.SplashX6.utility.Utility
 import com.wrapper.spotify.SpotifyApi
 import com.wrapper.spotify.SpotifyHttpManager
 import com.wrapper.spotify.enums.ModelObjectType
-import com.wrapper.spotify.exceptions.detailed.BadRequestException
 import com.wrapper.spotify.model_objects.specification.*
 import com.wrapper.spotify.requests.AbstractRequest
 import com.wrapper.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest
@@ -21,21 +52,23 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
- * # Spotify intergration for Splash X6.
+ * # Spotify integration for Splash X6.
  *
- * This object handles authentication, and the compilation & execution of requests
+ * This object handles authentication of this client with the Spotify API.
+ *
+ * Once authenticated, handles the compilation & execution of requests
  * between this application and the spotify API.
  *
  * TODO use refresh token. User has to reconnect every access token expires.
  *
  * @since PRE-ALPHA 0.0.2
  * @author [Jordan T Gray](https://shinkson47.in)
- * @version 1.1
+ * @version 1.11
  */
 object Spotify {
 
     /**
-     *  # If true, disables ability to perform any API request.
+     *  # If true, prevents API requests from being made.
      */
     var DISABLE : Boolean = false
         private set
@@ -43,25 +76,31 @@ object Spotify {
         fun disable() { DISABLE = true }
 
     /**
-     * # If any request encountered an issue, it'll be stored here until the next request.
-     * Will automatically be set to null if another request is successful, or replaced by it's exception.
+     * # If any request encountered an issue, it'll be stored here until the next request is made.
      *
-     * Poll to determine cause of request failure.
+     * Any exception thrown whilst [execute]ing a request will stored here.
+     *
+     * The lifetime of this error is until the execution next request, which will either replace
+     * with a new error, or clear it to null if it encountered no error.
+     *
+     * Poll this exception to determine cause of request failure.
      */
     var ERROR : Exception? = null
         private set
 
     /**
-     * # Spotify supported playback repeat modes
+     * ## Spotify supported playback repeat modes
      *
      * enum value names match strings which spotify api expects, so you can use
      *
      * > `RepeatMode.track.toString()`
+     *
+     * TODO X6 does not support repeat mode.
      */
     enum class RepeatMode { track, context, off }
 
     /**
-     * # Types of sources from spotify that Splash can search for in the user's library.
+     * ## Types of sources from spotify that Splash can search for in the user's library.
      */
     enum class SpotifySourceType { playlist, artist, album }
 
@@ -76,20 +115,17 @@ object Spotify {
      *
      * If no credentials are saved, or they are not / no longer valid then returns false.
      */
-    fun createFromExisting() : Boolean {
-        (Assets.preferences.getString("SPOTIFY_AUTH_CODE") != "" && loadToken())
-            .let {
-                if (it) build()
-                return it
-            }
-    }
+    fun createFromExisting(): Boolean =
+        (Assets.REF_PREFERENCES.getString("SPOTIFY_AUTH_CODE") != "" && loadToken())
+            .also { if (it) build() }
+
 
 
     /**
      * # 1 of 2 - Builds API connection.
      * - Authorizes this application via a web re-direct.
      *
-     * This gives us our [cachedAuthCode] which authorises this application to perform actions on the user's account
+     * This gives us our [cachedOTP] which authorises this application to perform actions on the user's account
      * We only need to do this once, after we can store it.
      *
      * ## IMPORTANT API NOTE
@@ -108,10 +144,12 @@ object Spotify {
         if (createFromExisting())
             return true
 
-        if (autoOnly) return false
-        // Otherwise initiate two part auth.
-        authoriseClient()
-        return false
+        // Otherwise initiate two part auth, if enabled.
+        return if (!autoOnly) {
+                    authoriseClient()
+                    true
+                } else
+                    false
     }
 
     /**
@@ -131,7 +169,7 @@ object Spotify {
      * recieve an authentication code. THEN call this method with said auth code.
      */
     fun create(AuthenticationCode : String) : Boolean {
-        cachedAuthCode = AuthenticationCode
+        cachedOTP = AuthenticationCode
 
         buildTokenRequest() // Now that we have an authentication code, we can create a request for a token.
         getToken()
@@ -141,13 +179,13 @@ object Spotify {
     }
 
     /**
-     * # Once connected, builds API requests and caches data.
+     * ## Once connected, builds API requests and caches data.
      */
     private fun build() { buildRequests(); buildCache() }
 
     /**
-     * # Tests ability to perform an API request
-     * By performing an [REQUEST_PROFILE] to test access to user's account via the API.
+     * ## Tests ability to perform an API request
+     * By performing an [REQUEST_CATAGORIES] to test access to user's account via the API.
      *
      * returns true if access was successful.
      */
@@ -156,7 +194,12 @@ object Spotify {
         return ERROR == null && implTestConnection()
     }
 
-    private fun implTestConnection() = execute(REQUEST_CATAGORIES) != null;
+    /**
+     * ## Performs a rudementary test with the api by [executing] [REQUEST_CATAGORIES].
+     *
+     * @return true if the result of execution was not null.
+     */
+    private fun implTestConnection() = execute(REQUEST_CATAGORIES) != null
 
 
     //=====================================================================
@@ -171,7 +214,14 @@ object Spotify {
      *
      * See [Spotify's scope docs.](https://developer.spotify.com/documentation/general/guides/scopes/)
      */
-    const val SCOPE = "user-modify-playback-state, user-read-playback-state, user-read-currently-playing, user-library-read, playlist-read-private, playlist-read-collaborative, user-follow-read"
+    private const val SCOPE =
+            "user-modify-playback-state," +
+            " user-read-playback-state," +
+            " user-read-currently-playing," +
+            " user-library-read," +
+            " playlist-read-private," +
+            " playlist-read-collaborative," +
+            " user-follow-read"
 
     /**
      * # General connection to the spotify api.
@@ -179,24 +229,28 @@ object Spotify {
      * Is the intermediary between this application and the spotify api.
      *
      * Performs requests, stores access credentials, compiles results. Does all the complex stuff
-     * so we don't have to.
+     * so we don't have to, with the help of the spotify wrapper library.
      */
     val spotifyApi: SpotifyApi = SpotifyApi.Builder()
         .setClientId("72cabe08e89f49808ac14523a2f809ae")
         .setClientSecret("9736d5764f1b4c4ab82547b9d34edd91")
+            // STOPSHIP the fucking secret is in the public source code lmaooo
             // TODO this is super bad but idk how to get around it. Should not keep secret in public source.
             //  Perhaps we could use github secret's storage?
         .setRedirectUri(SpotifyHttpManager.makeUri("https://www.shinkson47.in/SplashX6/spotify-callback"))
         .build()
 
     /**
-     * Cached OTP which authorizes this application to operate on the users account.
+     * # The OTP that the user provided after signing into Spotify.
+     * user to authenticate with spotify.
      *
-     * Obtained when the user gives access via web portal. Only valid then, only useable once.
+     * Only valid after [create] (1 of 2), and for use with [create] 2 of 2.
      *
-     * > Note that this is not the token which allows us to make api requests. Just to configure the connection.
+     * > Note that this is not the token which allows us to make api requests.
+     *
+     * Just to configure the connection, and get the tokens.
      */
-    private var cachedAuthCode = ""
+    private var cachedOTP = ""
 
     //=====================================================================
     //#endregion Fields
@@ -212,7 +266,7 @@ object Spotify {
      *
      * User copys this code, pastes it into the application, and it's used to call stage two of [create].
      *
-     * Access code is stored in [cachedAuthCode].
+     * Access code is stored in [cachedOTP].
      */
     private val PREAUTH_REQUEST_AUTHORIZATION = spotifyApi.authorizationCodeUri()
         .scope(SCOPE)
@@ -232,7 +286,7 @@ object Spotify {
      *
      * This exsists purely because this request must be built after we have an auth code.
      */
-    private fun buildTokenRequest() { PREAUTH_REQUEST_TOKEN = spotifyApi.authorizationCode(cachedAuthCode).build() }
+    private fun buildTokenRequest() { PREAUTH_REQUEST_TOKEN = spotifyApi.authorizationCode(cachedOTP).build() }
 
 
     //=====================================================================
@@ -394,13 +448,13 @@ object Spotify {
         loadExpiryLast().plusSeconds(loadExpiresIn().toLong()).isBefore(LocalDateTime.now())
 
     private fun loadExpiryLast() : LocalDateTime =
-        LocalDateTime.ofEpochSecond(Assets.preferences.getLong("SPOTIFY_REFRESH_LAST", 0), 0, ZoneOffset.UTC)
+        LocalDateTime.ofEpochSecond(Assets.REF_PREFERENCES.getLong("SPOTIFY_REFRESH_LAST", 0), 0, ZoneOffset.UTC)
 
     private fun loadExpiresIn() : Int =
-        Assets.preferences.getInteger("SPOTIFY_REFRESH_LENGTH", 0)
+        Assets.REF_PREFERENCES.getInteger("SPOTIFY_REFRESH_LENGTH", 0)
 
     private fun saveExpiry(lastRefresh : Long, expiresIn : Int) {
-        with (Assets.preferences) {
+        with (Assets.REF_PREFERENCES) {
             putLong("SPOTIFY_REFRESH_LAST", lastRefresh)
             putInteger("SPOTIFY_REFRESH_LENGTH", expiresIn)
             flush()
@@ -411,10 +465,10 @@ object Spotify {
      * # Stores the tokens on disk via [com.badlogic.gdx.Preferences].
      */
     private fun saveToken(accessToken: String, refreshToken: String) {
-        with (Assets.preferences) {
+        with (Assets.REF_PREFERENCES) {
             putString("SPOTIFY_ACCESS_TOKEN", accessToken)
             putString("SPOTIFY_REFRESH_TOKEN", refreshToken)
-            putString("SPOTIFY_AUTH_CODE", cachedAuthCode)
+            putString("SPOTIFY_AUTH_CODE", cachedOTP)
             flush()
         }
     }
@@ -427,13 +481,13 @@ object Spotify {
      * If data is not valid, cached tokes are deleted.
      */
     private fun loadToken() : Boolean {
-        with (Assets.preferences) {
+        with (Assets.REF_PREFERENCES) {
             cacheToken(getString("SPOTIFY_ACCESS_TOKEN"), getString("SPOTIFY_REFRESH_TOKEN"))
-            cachedAuthCode = getString("SPOTIFT_AUTH_CODE")
+            cachedOTP = getString("SPOTIFT_AUTH_CODE")
         }
         buildRequests()
         if (!testConnection()) {
-            cachedAuthCode = ""
+            cachedOTP = ""
             cacheToken("","")
             return false
         }

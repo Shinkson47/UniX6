@@ -1,25 +1,48 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6.rendering.windows
 
-import com.badlogic.gdx.Audio
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Graphics
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea
 import com.badlogic.gdx.scenes.scene2d.ui.Tree
 import com.shinkson47.SplashX6.audio.AudioController
-import com.shinkson47.SplashX6.audio.Spotify
+import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
 import com.shinkson47.SplashX6.rendering.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.optionspanes.LanguageSelectionListener
-import com.shinkson47.SplashX6.utility.Assets.SKIN
-import com.shinkson47.SplashX6.utility.Assets.SKIN_KENNEY
+import com.shinkson47.SplashX6.utility.Assets.REF_SKIN_W95
 import com.shinkson47.SplashX6.utility.GraphicalConfig
 import com.shinkson47.SplashX6.utility.Languages
-import com.shinkson47.SplashX6.utility.Utility.local
 import com.shinkson47.SplashX6.utility.UtilityK
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
-import java.lang.Exception
-import java.util.function.Consumer
 
 /**
  * # A collection of tabs that provide configurable options to the user.
@@ -30,7 +53,7 @@ import java.util.function.Consumer
 class W_Options(val parent : ScalingScreenAdapter) : StageWindow("generic.any.options") {
 
     init {
-        val t : Tree<Tree.Node<*, *, *>, Any> = Tree(SKIN)
+        val t : Tree<Tree.Node<*, *, *>, Any> = Tree(REF_SKIN_W95)
         t.selection.isDisabled = true
         t.indentSpacing = 30f
 
@@ -54,7 +77,7 @@ class W_Options(val parent : ScalingScreenAdapter) : StageWindow("generic.any.op
                     RootNode(
                         "generic.sound.volume",
                             SliderNode<Float>(AudioController, "musicVolume", "generic.sound.musicVolume", 0f, 1f, 0.1f),
-                            SliderNode<Float>(AudioController, "buttonVolume", "generic.sound.sfxVolume", 0f, 1f, 0.1f), // TODO audio controller channel need updating. this isn't for buttons.
+                            SliderNode<Float>(AudioController, "SFXVolume", "generic.sound.sfxVolume", 0f, 1f, 0.1f), // TODO audio controller channel need updating. this isn't for buttons.
                             CheckboxNode(AudioController, "isMuted", "generic.sound.mute"),
                     ),
             ),

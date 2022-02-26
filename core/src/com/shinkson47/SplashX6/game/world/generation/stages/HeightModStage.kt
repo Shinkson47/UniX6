@@ -1,3 +1,35 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6.game.world.generation.stages
 
 import com.auburn.fastnoiselite.FastNoiseLite
@@ -16,6 +48,10 @@ import com.shinkson47.SplashX6.game.world.generation.ModifyingGenerationStage
  */
 class HeightModStage : ModifyingGenerationStage() {
 
+    /**
+     * # The types of terrain that we can generate height for
+     * since we don't have sprites for hills in every kind of terrain.
+     */
     private val hightableTerrains : Array<String> = arrayOf(
         "p_p_p_p",
         "g_g_g_g"
@@ -23,6 +59,7 @@ class HeightModStage : ModifyingGenerationStage() {
 
     // TODO Height generation is not very good. Perhaps scale the noise? Check for large flat areas to modify height?
     private lateinit var noise : FastNoiseLite
+
     override fun execute(it: WorldTerrain) {
         noise = GenerationCompanion.createNoiseGenerator()
         noise.SetFrequency(GenerationCompanion.heightFrequency)
@@ -34,6 +71,8 @@ class HeightModStage : ModifyingGenerationStage() {
     /**
      * # Generates un-blent hill and mountain tiles
      * Based on current noise generation config and level thresholds.
+     *
+     * Essentially defines areas of the map that should be high.
      * @see [GenerationCompanion.MOUNTAIN_LEVEL]
      * @see [GenerationCompanion.HILL_LEVEL]
      */

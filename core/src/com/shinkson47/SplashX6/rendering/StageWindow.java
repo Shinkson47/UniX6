@@ -1,3 +1,35 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6.rendering;
 
 import com.badlogic.gdx.graphics.Pixmap;
@@ -13,10 +45,7 @@ import com.badlogic.gdx.utils.Align;
 import com.shinkson47.SplashX6.Client;
 import com.shinkson47.SplashX6.audio.AudioController;
 import com.shinkson47.SplashX6.game.GameHypervisor;
-import com.shinkson47.SplashX6.utility.Debug;
-import com.shinkson47.SplashX6.utility.TurnHook;
-import com.shinkson47.SplashX6.utility.Utility;
-import com.shinkson47.SplashX6.utility.UtilityK;
+import com.shinkson47.SplashX6.utility.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +53,6 @@ import java.util.function.Consumer;
 
 import static com.shinkson47.SplashX6.Client.DEBUG_MODE;
 import static com.shinkson47.SplashX6.audio.AudioController.GUI_SOUND;
-import static com.shinkson47.SplashX6.utility.Assets.SKIN;
 import static com.shinkson47.SplashX6.utility.Utility.local;
 import static java.lang.System.gc;
 
@@ -64,7 +92,7 @@ public abstract class StageWindow extends Window implements TurnHook {
     public static final Drawable lightBG;
 
     static {
-        seperatorStyle = new Label.LabelStyle(new Label("", SKIN).getStyle());
+        seperatorStyle = new Label.LabelStyle(new Label("", Assets.INSTANCE.getREF_SKIN_W95()).getStyle());
         Pixmap labelColor = new Pixmap(200, 200, Pixmap.Format.RGB888);
         labelColor.setColor(Client.hr, Client.hg, Client.b, Client.a);
         labelColor.fill();
@@ -86,7 +114,7 @@ public abstract class StageWindow extends Window implements TurnHook {
     /**
      * A select box shown on the game screen containing all game windows.
      */
-    private static final SelectBox<StageWindow> WINDOW_DOCK = new SelectBox(SKIN);
+    private static final SelectBox<StageWindow> WINDOW_DOCK = new SelectBox(Assets.INSTANCE.getREF_SKIN_W95());
     static {
         WINDOW_DOCK.setPosition(0f, 0f);
         WINDOW_DOCK.addListener(new StageWindow.LambdaChangeListener(o -> {
@@ -212,9 +240,9 @@ public abstract class StageWindow extends Window implements TurnHook {
         this(key, style, visible, true);
     }
     public StageWindow(String key, String style, Boolean visible, Boolean resizable) {
-        super("", SKIN);
+        super("", Assets.INSTANCE.getREF_SKIN_W95());
         this.title = key;
-        if (!style.equals("")) setStyle(SKIN.get(style, WindowStyle.class));
+        if (!style.equals("")) setStyle(Assets.INSTANCE.getREF_SKIN_W95().get(style, WindowStyle.class));
 
         center();
         placeTitle(style, key);
@@ -250,9 +278,9 @@ public abstract class StageWindow extends Window implements TurnHook {
         // If using a dialog
         if (windowStyle.equals("dialog") || windowStyle.equals("dialog-modal")) {
             // Use plain upper, with 'title' style class (which wraps in '[]' and opaque bg to cover window border.)
-            label = new Label(local(key).toUpperCase(), SKIN, "title");
+            label = new Label(local(key).toUpperCase(), Assets.INSTANCE.getREF_SKIN_W95(), "title");
         } else {
-            label = new Label(local(key).toUpperCase(), SKIN); // TODO this text needs to be white. Not sure why it isn't atm.
+            label = new Label(local(key).toUpperCase(), Assets.INSTANCE.getREF_SKIN_W95(), "white");
             w.getTitleTable().add(label).expandX();
 
             // IMPLEMENT a way for the user to configure which side the buttons are placed on.
@@ -283,14 +311,14 @@ public abstract class StageWindow extends Window implements TurnHook {
     }
     public static Cell<Label> label(String key, Table t){ return label(key, t, "default"); }
     public static Cell<Label> label(String key, Table t, String style){
-        return t.add(new Label(local(key), SKIN, style)).padTop(20f);
+        return t.add(new Label(local(key), Assets.INSTANCE.getREF_SKIN_W95(), style)).padTop(20f);
     }
 
     /**
      * Creates a localized checkbox
      */
     public static CheckBox checkBox(String key, Table t) {
-        CheckBox c = new CheckBox(local(key), SKIN);
+        CheckBox c = new CheckBox(local(key), Assets.INSTANCE.getREF_SKIN_W95());
         t.add(c).padTop(20f);
         return c;
     }
@@ -393,7 +421,7 @@ public abstract class StageWindow extends Window implements TurnHook {
         Actor... actors
     ) {
         // Construct dialog, that gives the result to the handler
-        Dialog dialog = new Dialog("", SKIN) {
+        Dialog dialog = new Dialog("", Assets.INSTANCE.getREF_SKIN_W95()) {
             protected void result(Object object) {
                 if (resultHandler != null)
                     resultHandler.accept((object == null) ? false : (boolean) object);
@@ -450,7 +478,7 @@ public abstract class StageWindow extends Window implements TurnHook {
      * @return the button created
      */
     public static TextButton button(String key, Consumer<?> e) {
-        TextButton b = new TextButton(local(key), SKIN);
+        TextButton b = new TextButton(local(key), Assets.INSTANCE.getREF_SKIN_W95());
         onClick(b, e);
         return b;
     }
@@ -554,7 +582,7 @@ public abstract class StageWindow extends Window implements TurnHook {
     public static void seperate(Table t, String key) {
         t.row();
         // Create a label that will be the header
-        Label l = new Label((key.isEmpty()) ? key : local(key), SKIN);
+        Label l = new Label((key.isEmpty()) ? key : local(key), Assets.INSTANCE.getREF_SKIN_W95());
 
         hsep(t)
                 .padTop(10)
@@ -602,7 +630,7 @@ public abstract class StageWindow extends Window implements TurnHook {
      * @return t
      */
     public static final Actor tooltip(Actor t, String s){
-        t.addListener(new TextTooltip(s, UtilityK.INSTANCE.getTtManager(), SKIN));
+        t.addListener(new TextTooltip(s, UtilityK.INSTANCE.getTtManager(), Assets.INSTANCE.getREF_SKIN_W95()));
         return t;
     }
 
@@ -610,7 +638,7 @@ public abstract class StageWindow extends Window implements TurnHook {
      * Adds a list in a scrollable pane of a fixed height
      */
     protected void addList(com.badlogic.gdx.scenes.scene2d.ui.List<?> list, String tooltipKey) {
-        ScrollPane sp = new ScrollPane(list, SKIN);
+        ScrollPane sp = new ScrollPane(list, Assets.INSTANCE.getREF_SKIN_W95());
         add(sp).fillX();
         tooltip(tooltipKey);
         getCell(sp).height(100f);

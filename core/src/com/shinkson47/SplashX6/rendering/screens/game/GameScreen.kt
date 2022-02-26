@@ -1,3 +1,35 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6.rendering.screens.game
 
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.mouse_focusOnTile
@@ -24,6 +56,7 @@ import com.shinkson47.SplashX6.game.GameHypervisor.Companion.unit_selected
 import com.shinkson47.SplashX6.game.units.Unit
 import com.shinkson47.SplashX6.input.mouse.MouseHandler
 import com.shinkson47.SplashX6.rendering.Camera
+import com.shinkson47.SplashX6.rendering.renderers.KeyBindRenderer
 import com.shinkson47.SplashX6.utility.Debug
 import org.xguzm.pathfinding.grid.GridCell
 import java.util.function.Consumer
@@ -39,9 +72,7 @@ class GameScreen : ScalingScreenAdapter() {
     //========================================================================
     //#region fields
     //========================================================================
-    /**
-     * <h2>Returns the camera wrapper</h2>
-     */
+
     /**
      * <h2>Camera used to observe the world</h2>
      */
@@ -52,16 +83,14 @@ class GameScreen : ScalingScreenAdapter() {
      * renders from perspective of [this.cam]
      */
     var r: IsometricStaggeredTiledMapRenderer? = null
-    /**
-     * <h2>Returns the shape renderer</h2>
-     */
+
     /**
      * <h2>A renderer used to draw primative shapes</h2>
      */
     val sr: ShapeRenderer
-    /**
-     * <h2>Returns the direct screen drawing font</h2>
-     */
+
+    val kbr = KeyBindRenderer()
+
     /**
      * <h2>A font used for direct screen drawing</h2>
      */
@@ -108,18 +137,22 @@ class GameScreen : ScalingScreenAdapter() {
         MouseHandler.configureGameInput(stage)
 
         // Add to stage
-        menu = Menu(this)
-        stage.addActor(menu)
-        stage.addActor(StageWindow.getWINDOW_DOCK())
+        with (stage) {
+            addActor(Menu(this@GameScreen))
+            addActor(StageWindow.getWINDOW_DOCK())
+            addActor(kbr)
+        }
     }
     //========================================================================
     //#endregion construction
     //#region rendering operations
     //========================================================================
+
     /**
      * <h2>Renders the next frame</h2>
      */
     override fun render(delta: Float) {
+
         // Render the world
         r!!.render()
 
@@ -138,7 +171,7 @@ class GameScreen : ScalingScreenAdapter() {
             )
         }
 
-        if (cm_isSelectingDestination || GameData.selectedUnit?.destX != -1)
+        if (cm_isSelectingDestination || GameData.selectedUnit?.destination?.first != -1)
             renderDestinationLine()
 
         var v = mouse_focusOnTile()
@@ -171,8 +204,8 @@ class GameScreen : ScalingScreenAdapter() {
         GameData.player!!.cities.forEach(
             Consumer {
                     city: City -> city.draw(worldBatch)
-                    font.draw(worldBatch, city.name, city.getPosition().x, city.getPosition().y)
-                    font.draw(worldBatch, "Population : ${city.population}", city.getPosition().x, city.getPosition().y - 15)
+                    font.draw(worldBatch, city.name, city.cartesianPosition().x, city.cartesianPosition().y)
+                    font.draw(worldBatch, "Population : ${city.population}", city.cartesianPosition().x, city.cartesianPosition().y - 15)
             }
         )
         GameData.player!!.units.forEach(

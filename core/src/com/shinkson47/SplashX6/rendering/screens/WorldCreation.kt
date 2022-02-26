@@ -1,6 +1,37 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6.rendering.screens
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.MathUtils
@@ -8,17 +39,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.gdx.musicevents.tool.file.FileChooser
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.ai.StateMachine
-import com.shinkson47.SplashX6.game.Civilisation
+import com.shinkson47.SplashX6.game.Nation
 import com.shinkson47.SplashX6.game.GameData
 import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.doNewGameCallback
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.inGame
 import com.shinkson47.SplashX6.game.GameHypervisor.Companion.load
 import com.shinkson47.SplashX6.game.NationType
-import com.shinkson47.SplashX6.game.cities.CityType
 import com.shinkson47.SplashX6.game.world.generation.GenerationCompanion
-import com.shinkson47.SplashX6.game.world.generation.Generator
-import com.shinkson47.SplashX6.game.world.generation.WorldGenerationStage
 import com.shinkson47.SplashX6.network.NetworkClient
 import com.shinkson47.SplashX6.network.NetworkClient.connect
 import com.shinkson47.SplashX6.network.Server
@@ -28,11 +55,11 @@ import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
 import com.shinkson47.SplashX6.rendering.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
 import com.shinkson47.SplashX6.utility.Assets
-import com.shinkson47.SplashX6.utility.Assets.SKIN
+import com.shinkson47.SplashX6.utility.Assets.LANG_TIPS
+import com.shinkson47.SplashX6.utility.Assets.REF_SKIN_W95
 import com.shinkson47.SplashX6.utility.UtilityK.getIP
 import java.io.InvalidClassException
 import java.net.ConnectException
-import java.util.function.Consumer
 
 
 /**
@@ -68,7 +95,7 @@ class WorldCreation(
      */
     private val gameCreationWindow = W_GameCreation()
 
-    private val chooser = FileChooser.createPickDialog("Choose save file", SKIN, Gdx.files.external("/"))
+    private val chooser = FileChooser.createPickDialog("Choose save file", REF_SKIN_W95, Gdx.files.external("/"))
 
     init {
         chooser.setResultListener { success, result ->
@@ -108,7 +135,7 @@ class WorldCreation(
         controller.run()
         with(stage) {
             batch.begin()
-            SKIN.getDrawable("tiledtex").draw(batch, 0f, 0f, width, height)
+            REF_SKIN_W95.getDrawable("tiledtex").draw(batch, 0f, 0f, width, height)
             batch.end()
 
             act()
@@ -122,7 +149,7 @@ class WorldCreation(
     /**
      * # Displays another random tip from [Assets.TIPS] in [tipLabel].
      */
-    private fun nextTip() = tipLabel.setText(Assets.TIPS[MathUtils.random(Assets.TIPS.size - 1)])
+    private fun nextTip() = Assets.get<ArrayList<String>>(LANG_TIPS).let { tipLabel.setText(it[MathUtils.random(it.size - 1)]) }
 
     fun constructGeneratingText() = constructText("specific.gamecreation.generating")
     fun constructDeserializingText() = constructText("!Loading world. Please wait.")
@@ -144,7 +171,7 @@ class WorldCreation(
                 .padBottom(50f)
                 .row()
 
-            tipLabel = Label("", SKIN)
+            tipLabel = Label("", REF_SKIN_W95)
             nextTip()
             add(tipLabel)
         }
@@ -188,7 +215,7 @@ class WorldCreation(
 
             label("!Seed").left()
 
-            add(TextField("seed", SKIN)
+            add(TextField("seed", REF_SKIN_W95)
                 .apply { addListener { GenerationCompanion.SEED = text.hashCode(); true } }
             )
 
@@ -197,18 +224,18 @@ class WorldCreation(
             row()
             label("specific.gamecreation.civtype").left()
 
-            val x = SelectBox<NationType>(SKIN)
+            val x = SelectBox<NationType>(REF_SKIN_W95)
             x.setItems(*NationType.values())
             x.selected = x.items.first()
             add(x)
 
             row();
-            val lblLegend = label("!" + Civilisation.legend(GameData.pref_civType)).actor as Label
+            val lblLegend = label("!" + Nation.legend(GameData.pref_civType)).actor as Label
 
             //TODO i don't like this varialbe thingy
             x.addListener(LambdaChangeListener {
                 GameData.pref_civType = x.selected
-                lblLegend.setText(Civilisation.legend(x.selected))
+                lblLegend.setText(Nation.legend(x.selected))
                 pack()
                 centerStage()
             })

@@ -1,13 +1,46 @@
+/*░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░ FOSS 2022. The Splash Project.                                                                                                                                                 ░
+ ░ https://www.shinkson47.in/SplashX6                                                                                                                                             ░
+ ░ Jordan T. Gray.                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░           _____                    _____                    _____            _____                    _____                    _____                                           ░
+ ░          /\    \                  /\    \                  /\    \          /\    \                  /\    \                  /\    \                         ______           ░
+ ░         /::\    \                /::\    \                /::\____\        /::\    \                /::\    \                /::\____\                       |::|   |          ░
+ ░        /::::\    \              /::::\    \              /:::/    /       /::::\    \              /::::\    \              /:::/    /                       |::|   |          ░
+ ░       /::::::\    \            /::::::\    \            /:::/    /       /::::::\    \            /::::::\    \            /:::/    /                        |::|   |          ░
+ ░      /:::/\:::\    \          /:::/\:::\    \          /:::/    /       /:::/\:::\    \          /:::/\:::\    \          /:::/    /                         |::|   |          ░
+ ░     /:::/__\:::\    \        /:::/__\:::\    \        /:::/    /       /:::/__\:::\    \        /:::/__\:::\    \        /:::/____/                          |::|   |          ░
+ ░     \:::\   \:::\    \      /::::\   \:::\    \      /:::/    /       /::::\   \:::\    \       \:::\   \:::\    \      /::::\    \                          |::|   |          ░
+ ░   ___\:::\   \:::\    \    /::::::\   \:::\    \    /:::/    /       /::::::\   \:::\    \    ___\:::\   \:::\    \    /::::::\    \   _____                 |::|   |          ░
+ ░  /\   \:::\   \:::\    \  /:::/\:::\   \:::\____\  /:::/    /       /:::/\:::\   \:::\    \  /\   \:::\   \:::\    \  /:::/\:::\    \ /\    \          ______|::|___|___ ____  ░
+ ░ /::\   \:::\   \:::\____\/:::/  \:::\   \:::|    |/:::/____/       /:::/  \:::\   \:::\____\/::\   \:::\   \:::\____\/:::/  \:::\    /::\____\        |:::::::::::::::::|    | ░
+ ░ \:::\   \:::\   \::/    /\::/    \:::\  /:::|____|\:::\    \       \::/    \:::\  /:::/    /\:::\   \:::\   \::/    /\::/    \:::\  /:::/    /        |:::::::::::::::::|____| ░
+ ░  \:::\   \:::\   \/____/  \/_____/\:::\/:::/    /  \:::\    \       \/____/ \:::\/:::/    /  \:::\   \:::\   \/____/  \/____/ \:::\/:::/    /          ~~~~~~|::|~~~|~~~       ░
+ ░   \:::\   \:::\    \               \::::::/    /    \:::\    \               \::::::/    /    \:::\   \:::\    \               \::::::/    /                 |::|   |          ░
+ ░    \:::\   \:::\____\               \::::/    /      \:::\    \               \::::/    /      \:::\   \:::\____\               \::::/    /                  |::|   |          ░
+ ░     \:::\  /:::/    /                \::/____/        \:::\    \              /:::/    /        \:::\  /:::/    /               /:::/    /                   |::|   |          ░
+ ░      \:::\/:::/    /                  ~~               \:::\    \            /:::/    /          \:::\/:::/    /               /:::/    /                    |::|   |          ░
+ ░       \::::::/    /                                     \:::\    \          /:::/    /            \::::::/    /               /:::/    /                     |::|   |          ░
+ ░        \::::/    /                                       \:::\____\        /:::/    /              \::::/    /               /:::/    /                      |::|   |          ░
+ ░         \::/    /                                         \::/    /        \::/    /                \::/    /                \::/    /                       |::|___|          ░
+ ░          \/____/                                           \/____/          \/____/                  \/____/                  \/____/                         ~~               ░
+ ░                                                                                                                                                                                ░
+ ░                                                                                                                                                                                ░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░*/
+
 package com.shinkson47.SplashX6.audio
 
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.shinkson47.SplashX6.rendering.StageWindow
-import com.shinkson47.SplashX6.utility.Assets.MUSIC_MAIN_MENU
-import com.shinkson47.SplashX6.utility.Assets.SFX_BUTTON
+import com.shinkson47.SplashX6.utility.Assets
 
 /**
- * <h1>Audio Controller</h1>
+ * # Controller for in-built audio and music.
+ * Note that this does not handle [Spotify].
  *
  * @author Jordan Gray
  * @since PRE-ALPHA 0.0.1
@@ -18,95 +51,85 @@ object AudioController {
     //#region Fields
     // ==================================================
 
+    var SONGS: ArrayList<Music> = ArrayList()
+
     /**
-     * <h2>The default volume levels</h2>
+     * ## The default volume levels
      */
     private const val DEFAULT_VOLUME = 0.2f
+
+    /**
+     * Volume for SFX.
+     */
+    var SFXVolume = DEFAULT_VOLUME
+        set(value) {
+            field = value
+            playButtonSound()
+        }
 
     var musicVolume = DEFAULT_VOLUME
         set(value) {
             field = value
-            assertNowPlayingVolume()
+            assertVolume()
         }
 
-    var buttonVolume = DEFAULT_VOLUME
-
     /**
-     * Determines if audio should be played, or not.
+     * Determines globally if audio should be played, or not.
      */
     var isMuted = false
+        set(value) {
+            field = value
+
+            if (field)
+                pauseMusic()
+            else
+                resumeMusic()
+        }
+    // TODO get and set on here for issue
 
     /**
      * <h2>Listener placed on GUI elements to play a sound when interacted with.</h2>
      */
-    @JvmField
-    val GUI_SOUND: ClickListener = StageWindow.LambdaClickListener { AudioController.playButtonSound() }
+    @JvmField val GUI_SOUND: ClickListener = StageWindow.LambdaClickListener { playButtonSound() }
 
     /**
      * <h2>Pointer to the music resource that we are currently playing.</h2>
      * Should never be null.
      */
-    var nowPlaying = MUSIC_MAIN_MENU
+    var nowPlaying = Assets.get<Music>(Assets.AUDIO_MUSIC_MENU)
+        private set(value) {
+            field = value
+            assertVolume()
+        }
+        get
 
     /**
-     * The currently chosen GamePlaylist for this applications in-game soundtrack.
+     * The current in-game soundtrack playlist.
      */
-    private var currentPlaylist: GamePlaylist? = null
+    private var currentPlaylist: Playlist? = null
+        set(value) {
+            field = value
+            value?.let { play(it.reset()) }
+        }
 
     // ==================================================
     //#endregion Fields
-    //#region Volume API
+    //#region Miscellaneous
     // ==================================================
-
-    /**
-     * Stops now playing and prevents more music from being played.
-     */
-    @Synchronized
-    fun muteAudio() {
-        pauseMusic()
-        isMuted = true
-    }
-
-    /**
-     * Un-Mutes the volume of ALL audio in this application.
-     */
-    @Synchronized
-    fun unmuteAudio() {
-        isMuted = false
-        resumeMusic()
-    }
-
-    /**
-     * @param mute
-     */
-    @Synchronized
-    fun setMute(mute: Boolean = true) {
-        if (mute)
-            muteAudio()
-        else
-            unmuteAudio()
-    }
 
     /**
      * Makes sure that now playing is at the current volume.
      */
-    fun assertNowPlayingVolume() {
-        nowPlaying.volume = musicVolume
-    }
-
-    // ==================================================
-    //#endregion Volume API
-    //#region Audio triggers api
-    // ==================================================
+    private fun assertVolume() = nowPlaying.apply { volume = musicVolume }
 
     /**
      * Audible sound (music) for the this application's main menu.
      */
     @JvmStatic
     fun playMainMenu() {
-        if (nowPlaying == MUSIC_MAIN_MENU && nowPlaying.isPlaying)
+        if (nowPlaying == Assets.get<Music>(Assets.AUDIO_MUSIC_MENU) && nowPlaying.isPlaying)
             return
-        playOnLoop(MUSIC_MAIN_MENU)
+        playOnLoop(Assets.get(Assets.AUDIO_MUSIC_MENU))
     }
 
     /**
@@ -115,33 +138,26 @@ object AudioController {
      * @return the ID of the new clip. If muted, returns -1 with no effect.
      */
     fun playButtonSound(): Long = if (isMuted) -1
-    else SFX_BUTTON.play(buttonVolume)
+    else Assets.get<Sound>(Assets.AUDIO_SFX_BUTTON).play(SFXVolume)
 
     // ==================================================
-    //#endregion Audio triggers api
+    //#endregion misc
     //#region Music controls
     // ==================================================
 
     /**
-     * Performs {@link Music#stop()} on now playing
+     * Performs [Music.stop] on [nowPlaying]
      */
-    @Synchronized
-    fun stopMusic() {
-        nowPlaying.stop()
-    }
+    fun stopMusic() = nowPlaying.stop()
 
     /**
      * Performs {@link Music#pause()} ()} on now playing
      */
-    @Synchronized
-    fun pauseMusic() {
-        nowPlaying.pause()
-    }
+    fun pauseMusic() = nowPlaying.pause()
 
     /**
      * Performs {@link Music#play()} ()} on now playing
      */
-    @Synchronized
     fun resumeMusic() {
         if (!isMuted)
             nowPlaying.play()
@@ -151,9 +167,7 @@ object AudioController {
      * Skips the currently playing song in this application, playing the next song in the playlist.
      */
     @JvmStatic
-    fun nextSong() {
-        play(currentPlaylist?.next())
-    }
+    fun nextSong() = play(currentPlaylist?.next())
 
     /**
      * Plays the previous song in the playlist.
@@ -175,11 +189,10 @@ object AudioController {
      * @return m
      */
     fun playOnLoop(music: Music): Music {
-        if (!isMuted) {
-            music.setLooping(true)
+        return music.apply {
+            music.isLooping = true
             play(music)
         }
-        return music
     }
 
     /**
@@ -190,13 +203,11 @@ object AudioController {
      * @return nowPlaying pointer.
      */
     fun play(music: Music?): Music {
-        if (music == null)
-            return nowPlaying
-
-        stopMusic()               // Stop now playing
-        nowPlaying = music         // Swap to new music
-        assertNowPlayingVolume()   // Make sure new music is at right volume
-        resumeMusic()              // The play it.
+        if (music != null && !isMuted) {
+            stopMusic()
+            nowPlaying = music
+            resumeMusic()
+        }
         return nowPlaying
     }
 
@@ -207,9 +218,9 @@ object AudioController {
      * @return Plays the first song at index 0 in the chosen playlist.
      */
     @JvmStatic
-    fun playPlaylist(playlist: GamePlaylist): Music {
+    fun playPlaylist(playlist: Playlist): Music {
         currentPlaylist = playlist
-        return play(playlist.reset())
+        return currentPlaylist!!.currentSong
     }
 
     /**
