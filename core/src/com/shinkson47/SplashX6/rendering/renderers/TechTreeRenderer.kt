@@ -47,8 +47,10 @@ import com.shinkson47.SplashX6.game.Advancement
 import com.shinkson47.SplashX6.game.AdvancementTree
 import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.rendering.windows.DoubleClickTreeListener
 import com.shinkson47.SplashX6.utility.Assets
 import com.shinkson47.SplashX6.utility.Assets.DATA_TECHS
+import com.shinkson47.SplashX6.utility.AutoFocusScrollPane
 
 /**
  * # TODO
@@ -72,7 +74,7 @@ class TechTreeRenderer : StageWindow("!Techs") {
 
 
     val t = Table()
-    val sp = ScrollPane(t, Assets.REF_SKIN_W95)
+    val sp = AutoFocusScrollPane(t)
     val allLabels = Array<Label>()
 
 //
@@ -105,8 +107,7 @@ class TechTreeRenderer : StageWindow("!Techs") {
         add(sp)
             .maxWidth(stage.height)
             .maxWidth(stage.width - 10)
-            .expand()
-            .fill()
+
 
 
         val depths = HashMap<Advancement, Int>()

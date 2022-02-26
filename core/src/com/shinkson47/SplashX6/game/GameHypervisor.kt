@@ -350,7 +350,7 @@ class GameHypervisor {
                 throw IllegalArgumentException("Tried to select a unit that does not exist in the game data!")
 
             GameData.selectedUnit = unit
-            unit_view();
+            unit_view()
         }
 
         /**
@@ -662,6 +662,7 @@ class GameHypervisor {
         @JvmStatic
         fun cm_toggle() {
             if (cm_active) cm_exit() else cm_enter()
+            unit_view()
         }
 
         //private fun cm_showStateCaps(value : Boolean) = Toolkit.getDefaultToolkit().setLockingKeyState(KeyEvent.VK_CAPS_LOCK, value)
