@@ -34,24 +34,30 @@ package com.shinkson47.SplashX6.utility
 
 import com.badlogic.gdx.Gdx
 import com.shinkson47.SplashX6.Client
+import com.shinkson47.SplashX6.audio.AudioController
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
+import com.shinkson47.SplashX6.game.Hypervisor
 import com.shinkson47.SplashX6.network.NetworkClient
 import com.shinkson47.SplashX6.network.Server
 import com.shinkson47.SplashX6.rendering.screens.Warroom
 import com.shinkson47.SplashX6.rendering.screens.MainMenu
 import com.shinkson47.SplashX6.rendering.screens.WorldCreation
 import com.shinkson47.SplashX6.utility.Utility.message
-import com.shinkson47.SplashX6.utility.Utility.warnDev
 import java.util.function.Predicate
 
 /**
- * # TODO
+ * # A validation system for checking common predicates on [Hypervisor] api calls.
+ * Checks that a call to the hypervisor was made in a state were that call can be made.
+ *
+ * If in an unsupported state, some other action happens.
+ *
  * @author [Jordan T. Gray](https://www.shinkson47.in) on 15/05/2021
  * @since v1
  * @version 1
  */
 class APICondition @JvmOverloads constructor() {
+
+    // TODO lazy message support.
 
     companion object {
 
@@ -69,12 +75,16 @@ class APICondition @JvmOverloads constructor() {
         @JvmStatic
         fun invalidCall(requiredState : Predicate<Any?>, onIllegalState : Runnable): Boolean {
             try {
-                validateCall(requiredState, onIllegalState)
+                if (!requiredState.test(null))
+                    throw APIException("")
             } catch (ignored: APIException) {
+                try {
+                    onIllegalState.run()
+                } catch (doubleignored : APIException) {}
                 Gdx.app.log("API Validation warning", "An API call failed to meet call condition, but the exception will be ignored.")
                 return true
             }
-            return false;
+            return false
         }
 
         /**
@@ -130,6 +140,7 @@ class APICondition @JvmOverloads constructor() {
         class _WARN_USER(val message: String) : Runnable {
             override fun run() {
                 //StageWindow.dialog(caller, "Invalid operation!", "$message", "Whoops, OK!", "", null)
+                AudioController.error()
                 message(message)
                 _THROW(message).run()
             }
@@ -147,14 +158,14 @@ class APICondition @JvmOverloads constructor() {
          *  # This API call requires that we are in game.
          */
         @JvmField
-        val REQ_IN_GAME: Predicate<Any?> = Predicate { GameHypervisor.inGame }
+        val REQ_IN_GAME: Predicate<Any?> = Predicate { Hypervisor.inGame }
 
         /**
          * # This API call can only be performed when not in a game
          * Doesn't matter where we are, so long as we're not in a game.
          */
         @JvmField
-        val REQ_NOT_IN_GAME: Predicate<Any?> = Predicate { !GameHypervisor.inGame }
+        val REQ_NOT_IN_GAME: Predicate<Any?> = Predicate { !Hypervisor.inGame }
 
         /**
          * # This API call can only be performed whilst on the game loading screen.

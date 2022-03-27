@@ -34,11 +34,9 @@ package com.shinkson47.SplashX6.network
 
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
 import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.lang.Exception
 import java.net.BindException
 import java.net.ServerSocket
 import java.net.Socket
@@ -100,7 +98,7 @@ object Server {
          * # Sends the status of the game to the client.
          */
         fun status() {
-            if (Client.client!!.screen is GameScreen)
+            if (Client.client.screen is GameScreen)
                 send(Packet(PacketType.Start, GameData))
             else
                 send(Packet(PacketType.Status, GameData))

@@ -36,14 +36,15 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.utils.Align
 import com.gdx.musicevents.tool.file.FileChooser
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.ai.StateMachine
-import com.shinkson47.SplashX6.game.Nation
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.doNewGameCallback
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.load
+import com.shinkson47.SplashX6.game.Hypervisor
+import com.shinkson47.SplashX6.game.Hypervisor.doNewGameCallback
+import com.shinkson47.SplashX6.game.Hypervisor.load
+import com.shinkson47.SplashX6.game.Nation
 import com.shinkson47.SplashX6.game.NationType
 import com.shinkson47.SplashX6.game.world.generation.GenerationCompanion
 import com.shinkson47.SplashX6.network.NetworkClient
@@ -51,13 +52,13 @@ import com.shinkson47.SplashX6.network.NetworkClient.connect
 import com.shinkson47.SplashX6.network.Server
 import com.shinkson47.SplashX6.network.Server.alive
 import com.shinkson47.SplashX6.network.Server.boot
-import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
-import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.rendering.ui.ScalingScreenAdapter
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
 import com.shinkson47.SplashX6.utility.Assets
 import com.shinkson47.SplashX6.utility.Assets.LANG_TIPS
 import com.shinkson47.SplashX6.utility.Assets.REF_SKIN_W95
-import com.shinkson47.SplashX6.utility.UtilityK.getIP
+import com.shinkson47.SplashX6.utility.Utility.getIP
 import java.io.InvalidClassException
 import java.net.ConnectException
 
@@ -104,7 +105,7 @@ class WorldCreation(
                 controller.switchState(2)
                 true
             } else {
-                GameHypervisor.EndGame()
+                Hypervisor.endGame()
                 false
             }
 
@@ -122,7 +123,7 @@ class WorldCreation(
     //#endregion actors
     //==========================================
 
-    private val controller = WorldCreationScreenController()
+    val controller = WorldCreationScreenController()
 
     //==========================================
     //#region operations
@@ -144,6 +145,8 @@ class WorldCreation(
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
             cancel()
+
+        super.render(delta)
     }
 
     /**
@@ -213,37 +216,54 @@ class WorldCreation(
             //      Advanced terrain
             addButton("specific.gamecreation.terrainSettings", true, true) { stage.addActor(TerrainGenerationEditor()) }
 
-            label("!Seed").left()
+            label("!Seed")
 
-            add(TextField("seed", REF_SKIN_W95)
-                .apply { addListener { GenerationCompanion.SEED = text.hashCode(); true } }
-            )
+
+            expandfill(add(TextField("seed", REF_SKIN_W95))).apply {
+                addListener { GenerationCompanion.SEED = actor.text.hashCode(); true }
+            }
+
 
             hsep()
 
             row()
-            label("specific.gamecreation.civtype").left()
+
+            label("specific.gamecreation.civtype")
 
             val x = SelectBox<NationType>(REF_SKIN_W95)
             x.setItems(*NationType.values())
             x.selected = x.items.first()
-            add(x)
+            expandfill(add(x))
+            row()
 
-            row();
-            val lblLegend = label("!" + Nation.legend(GameData.pref_civType)).actor as Label
+            label("!Number of opponents")
+            with (expandfill(add(TextField(GameData.pref_civCount.toString(), REF_SKIN_W95)))) {
+                actor.addListener(LambdaChangeListener {
+                        try {
+                            GameData.pref_civCount = Integer.valueOf(actor.text)
+                        } catch (e : NumberFormatException) {
+                            actor.text = GameData.pref_civCount.toString()
+                        }
+                })
+            }
+            row()
 
-            //TODO i don't like this varialbe thingy
+            val lblLegend = expandfill(label("!" + Nation.legend(GameData.pref_civType)))
+                .colspan(2)
+                .padLeft(5f)
+                .padRight(5f)
+                .actor as Label
+
+
             x.addListener(LambdaChangeListener {
                 GameData.pref_civType = x.selected
                 lblLegend.setText(Nation.legend(x.selected))
+                    .also { align(Align.center) }
                 pack()
                 centerStage()
             })
 
-            span(
-                hsep()
-                    .padTop(30f)
-            )
+            span(hsep().padTop(30f))
 
             span(addButton("generic.game.new") {
                 GameData.pref_civType = x.selected
@@ -269,7 +289,7 @@ class WorldCreation(
             row()
             label("!Wait for players, then click start.")
             row()
-            addButton("!Start Game!") { GameHypervisor.doNewGameFINAL() }
+            addButton("!Start Game!") { Hypervisor.doNewGameFINAL() }
 
             pack()
         }
@@ -385,11 +405,11 @@ class WorldCreation(
                                 load(Gdx.files.external(chooser.result.path()).file())
                             } catch (e : InvalidClassException) {
                                 constructText("!This save file is incompatable with this version of X6.")
-                                this@WorldCreation.dialog("!Unable to load", "!This save file is incompatable with this version of X6.") { GameHypervisor.EndGame() }
+                                this@WorldCreation.dialog("!Unable to load", "!This save file is incompatable with this version of X6.") { Hypervisor.endGame() }
                                 switchState(1)
                             } catch (e : Exception) {
                                 constructText("!Unable to load")
-                                this@WorldCreation.dialog("!Unable to load", "!Encountered some error whilst loading that save : \n ${e.message}") { GameHypervisor.EndGame() }
+                                this@WorldCreation.dialog("!Unable to load", "!Encountered some error whilst loading that save : \n ${e.message}") { Hypervisor.endGame() }
                                 switchState(1)
                             }
                         } else {
@@ -406,7 +426,7 @@ class WorldCreation(
                     "Complete",
                     {},
                     this,
-                    { GameHypervisor.doNewGameFINAL() },
+                    { Hypervisor.doNewGameFINAL() },
                     null
                 )
             )
@@ -420,7 +440,7 @@ class WorldCreation(
                         try {
                             connect()
                         } catch (e: ConnectException) {
-                                this@WorldCreation.dialog("!Unable to connect", "!Failed to connect. Check there's another client hosting.") { GameHypervisor.EndGame() }
+                                this@WorldCreation.dialog("!Unable to connect", "!Failed to connect. Check there's another client hosting.") { Hypervisor.endGame() }
                         }
                         isDeserializing = true
                     },

@@ -33,10 +33,10 @@
 import com.badlogic.gdx.scenes.scene2d.Event
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.gameRenderer
+import com.shinkson47.SplashX6.game.Hypervisor.gameRenderer
 import com.shinkson47.SplashX6.rendering.Camera.Companion.FRUSTUM_WIDTH_MOD
 import com.shinkson47.SplashX6.rendering.Camera.Companion.TILT_MINIMUM
-import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.utility.Assets
 
 /**

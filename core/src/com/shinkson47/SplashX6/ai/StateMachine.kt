@@ -52,6 +52,14 @@ import java.util.function.Predicate
  */
 open class StateMachine(val name: String) : Runnable {
 
+    companion object {
+        val activeMachines = ArrayList<StateMachine>()
+    }
+
+    init { activeMachines.add(this) }
+    protected fun finalize() =
+        activeMachines.remove(this)
+
     /**
      * ## If true, machine logs every state change.
      * False by default.
@@ -61,7 +69,7 @@ open class StateMachine(val name: String) : Runnable {
     /**
      * ## All states in this state machine.
      */
-    private val states = ArrayList<State>()
+    val states = ArrayList<State>()
 
     /**
      * ## Returns a given state from [states].
@@ -77,10 +85,10 @@ open class StateMachine(val name: String) : Runnable {
      *
      * TODO if not set, automatically inherited from default.
      */
-    private var currentState: State
+    var currentState: State
         get() = _currentState ?: throw UninitializedPropertyAccessException("\"tmp\" was queried before being initialized")
 
-        set(value) {
+        private set(value) {
             checkStateExists(value)
             _currentState = value
         }
@@ -250,7 +258,7 @@ open class StateMachine(val name: String) : Runnable {
      * [StateMachine.State.enter] on [index].
      *
      */
-    private fun switchState(newState: StateMachine.State) {
+    fun switchState(newState: StateMachine.State) {
         print("Switch state $currentState to $newState")
         checkStateExists(newState)
 

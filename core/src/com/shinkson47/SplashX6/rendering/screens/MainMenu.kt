@@ -39,12 +39,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.shinkson47.SplashX6.Client.Companion.client
 import com.shinkson47.SplashX6.audio.AudioController
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.ConnectGame
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.LoadGame
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.NewGame
+import com.shinkson47.SplashX6.game.Hypervisor.ConnectGame
+import com.shinkson47.SplashX6.game.Hypervisor.LoadGame
+import com.shinkson47.SplashX6.game.Hypervisor.NewGame
 import com.shinkson47.SplashX6.input.mouse.MouseHandler
-import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
-import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.rendering.ui.ScalingScreenAdapter
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.W_Options
 import com.shinkson47.SplashX6.utility.Assets
 import com.shinkson47.SplashX6.utility.Assets.REF_SKIN_W95
@@ -93,7 +93,13 @@ class MainMenu : ScalingScreenAdapter() {
             addButton("generic.game.load") { LoadGame() }
             addButton("!Connect") { ConnectGame() }
             addButton("generic.any.options") { optionsWindow.isVisible = true; optionsWindow.toFront() }
-            addButton("specific.menu.credits") { client!!.fadeScreen(CreditsScreen()) }
+            addButton("specific.menu.credits") {
+                client.fadeScreen(
+                    TextScreen(Assets.get(Assets.LANG_CREDITS),
+                        background = REF_SKIN_W95.getDrawable("tiledtex"),
+                        fontColor = Color.BLACK,
+                        onESC = this@MainMenu
+                    ) ) }
             addButton("generic.game.exit") { Gdx.app.exit() }
 
             isMovable = false
@@ -114,6 +120,7 @@ class MainMenu : ScalingScreenAdapter() {
 
         stage.act()
         stage.draw()
+        super.render(delta)
     }
 
     override fun doResize(width: Int, height: Int) {
@@ -122,8 +129,6 @@ class MainMenu : ScalingScreenAdapter() {
             makeEven((super.height * 0.5f) - (menuWindow!!.height * 0.5f))
         )
     }
-
-
 
     private fun makeEven(f: Float): Float {
         return (f / 2f).roundToInt() * 2f

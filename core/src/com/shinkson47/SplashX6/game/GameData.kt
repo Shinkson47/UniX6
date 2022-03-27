@@ -55,7 +55,7 @@ class _GameData : PartiallySerializable {
      */
     @JvmField var world : WorldTerrain? = null
 
-    @JvmField var civilisations : ArrayList<Nation> = ArrayList()
+    @JvmField var nations : ArrayList<Nation> = ArrayList()
 
 
     // This client's data
@@ -67,17 +67,34 @@ class _GameData : PartiallySerializable {
     @JvmField var player : Nation? = null
 
 
-    // ======================================
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
     // New game preferences
-    // ======================================
+    // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
     var pref_civType = NationType.values().first()
+    var pref_civCount = 3
 
 
 
 
+    /**
+     * # Applies [f] to every unit in the game.
+     *
+     * For every nation, for every unit in that nation, call the function f with that unit
+     *
+     * @param f (Unit) -> kotlin.Unit
+     */
+    fun forEveryUnit(f : (Unit) -> kotlin.Unit) =
+        forEveryNation { it.units.forEach { f(it) } }
 
-
-
+    /**
+     * Applies [f] to every nation in the game.
+     *
+     * For every nation in the list of nations, call the function f with that nation as its argument
+     *
+     * @param f (Nation) -> kotlin.Unit
+     */
+    fun forEveryNation(f : (Nation) -> kotlin.Unit) =
+        nations.forEach { f(it) }
 
 
     /**
@@ -88,33 +105,42 @@ class _GameData : PartiallySerializable {
         world = null
         player = null
         selectedUnit = null
-        civilisations.clear()
+        nations.clear()
     }
 
     /**
      * New game subroutines that creates data required for a new game
      */
     fun new() {
+        // Delete all data.
         clear()
-        player = GameHypervisor.civ_new(pref_civType)
+        System.gc()
+
+        // Create a new world
         world = Generator.doYourThing()
-        world!!.genPopulation()
+
+        // Create a new local player
+        player = Hypervisor.nation_new(pref_civType)
+
+
     }
+
 
     fun networkSet(gameState: _GameData) {
         world = gameState.world
-        GameHypervisor.gameRenderer!!.newRenderer()
+        Hypervisor.gameRenderer!!.newRenderer()
 
-        civilisations = gameState.civilisations
+        nations = gameState.nations
         deserialize()
     }
 
     override fun deserialize() {
         world!!.deserialize()
 
-        civilisations.forEach {
+        nations.forEach {
             it.units.forEach  { it.deserialize() }
-            it.cities.forEach { it.deserialize() }
+            it.settlements.forEach { it.deserialize() }
         }
     }
+
 }

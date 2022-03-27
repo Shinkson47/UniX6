@@ -45,11 +45,12 @@ import com.shinkson47.SplashX6.game.Advancement
 import com.shinkson47.SplashX6.game.Advancement.Companion.dependancyFor
 import com.shinkson47.SplashX6.game.Advancement.Companion.depth
 import com.shinkson47.SplashX6.game.AdvancementTree
-import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.game.GameData
+import com.shinkson47.SplashX6.game.Hypervisor
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.utility.Assets
-import com.shinkson47.SplashX6.utility.Assets.DATA_TECHS
-import com.shinkson47.SplashX6.utility.AutoFocusScrollPane
+import com.shinkson47.SplashX6.rendering.ui.AutoFocusScrollPane
+import com.shinkson47.SplashX6.rendering.windows.game.settlements.W_Settlements
 
 /**
  * # Window for viewing and selecting advancements.
@@ -60,7 +61,7 @@ import com.shinkson47.SplashX6.utility.AutoFocusScrollPane
  * @param advancementTree The advancement tree to be displayed.
  * @param titleKey Localised text to be displayed in the title.
  */
-abstract class W_Advancement(val advancementTree : AdvancementTree = Assets.get(DATA_TECHS), titleKey: String) : StageWindow(titleKey) {
+open class W_Advancement(titleKey: String, val advancementTree : AdvancementTree = GameData.player!!.advancementTree) : StageWindow(titleKey) {
 
     companion object {
         /**
@@ -115,6 +116,14 @@ abstract class W_Advancement(val advancementTree : AdvancementTree = Assets.get(
 
         populateTable()
 
+        row()
+        add(button("!Show Advancement Production") {
+            toggleShown()
+            docked(W_AdvancementProduction::class.java).toggleShown()
+        })
+            .fillX()
+            .expandX()
+
         pack()
         height += 20f
         centerStage()
@@ -142,11 +151,12 @@ abstract class W_Advancement(val advancementTree : AdvancementTree = Assets.get(
             val table = Table().apply { align(Align.center) }
 
             // Find all advancements in the current col
-            depths.keys.filter { depths[it] == index }.forEach {
+            depths.keys.filter { depths[it] == index }.forEach { ad ->
                 // then add a label for them.
                 table.add(
-                    Label(it.name, Assets.REF_SKIN_W95).also {
+                    Label(ad.name, Assets.REF_SKIN_W95).also {
                         allLabels.add(it)
+                        //tooltip(it, "Cost: $)
                         it.addListener(
                             object : ClickListener() {
                                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
@@ -187,6 +197,10 @@ abstract class W_Advancement(val advancementTree : AdvancementTree = Assets.get(
      */
     private fun onSelect(a: Label) {
         selected = Pair(advancementTree.getA(a.text.toString())!!, a)
+        GameData.player!!.advancementProuction.select(selected.first)
+        docked(W_AdvancementProduction::class.java).refresh()
+        docked(W_Settlements::class.java).refresh()
+
         highlightRequirements()
         calcAndCacheDependencyVecs()
     }
@@ -206,8 +220,8 @@ abstract class W_Advancement(val advancementTree : AdvancementTree = Assets.get(
             if (requiredBy != null) {
                 dependencyLineVectors.add(
                     Pair(
-                        screenspaceOf(labelFor(requiredBy), Align.left)!!,
-                        screenspaceOf(labelFor(currentAdvancement), Align.right)!!
+                        screenspaceOf(labelFor(requiredBy), Align.left),
+                        screenspaceOf(labelFor(currentAdvancement), Align.right)
                     )
                 )
             }
@@ -249,7 +263,7 @@ abstract class W_Advancement(val advancementTree : AdvancementTree = Assets.get(
      */
     override fun drawChildren(batch: Batch?, parentAlpha: Float) {
         super.drawChildren(batch, parentAlpha)
-            with(GameHypervisor.gameRenderer!!.sr) {
+            with(Hypervisor.gameRenderer!!.sr) {
                 val xOffset = scrollPane.visualScrollX
                 val yOffset = stage.height
                 color = Color.MAGENTA

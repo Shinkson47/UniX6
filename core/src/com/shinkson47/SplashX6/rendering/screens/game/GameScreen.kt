@@ -32,34 +32,33 @@
 
 package com.shinkson47.SplashX6.rendering.screens.game
 
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.mouse_focusOnTile
-import com.shinkson47.SplashX6.game.world.WorldTerrain.Companion.isoToCartesian
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.inGame
-import com.shinkson47.SplashX6.rendering.ScalingScreenAdapter
-import com.badlogic.gdx.maps.tiled.renderers.IsometricStaggeredTiledMapRenderer
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.shinkson47.SplashX6.rendering.screens.Warroom
-import com.shinkson47.SplashX6.rendering.StageWindow
-import com.shinkson47.SplashX6.game.world.WorldTerrain
-import com.shinkson47.SplashX6.game.cities.City
-import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.maps.MapRenderer
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.maps.MapRenderer
+import com.badlogic.gdx.maps.tiled.renderers.IsometricStaggeredTiledMapRenderer
 import com.badlogic.gdx.math.Vector3
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.cm_isSelectingDestination
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.unit_selected
+import com.shinkson47.SplashX6.game.Hypervisor
+import com.shinkson47.SplashX6.game.Hypervisor.cm_isSelectingDestination
+import com.shinkson47.SplashX6.game.Hypervisor.inGame
+import com.shinkson47.SplashX6.game.Hypervisor.mouse_focusOnTile
+import com.shinkson47.SplashX6.game.Hypervisor.unit_selected
+import com.shinkson47.SplashX6.game.cities.Settlement
 import com.shinkson47.SplashX6.game.units.Unit
+import com.shinkson47.SplashX6.game.world.WorldTerrain
+import com.shinkson47.SplashX6.game.world.WorldTerrain.Companion.isoToCartesian
 import com.shinkson47.SplashX6.input.mouse.MouseHandler
 import com.shinkson47.SplashX6.rendering.Camera
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.rendering.renderers.KeyBindRenderer
-import com.shinkson47.SplashX6.utility.Debug
+import com.shinkson47.SplashX6.rendering.screens.Warroom
+import com.shinkson47.SplashX6.rendering.ui.ScalingScreenAdapter
+import com.shinkson47.SplashX6.utility.debug.Debug
 import org.xguzm.pathfinding.grid.GridCell
-import java.util.function.Consumer
 
 /**
  * <h1>The screen used to display and interact with the game</h1>
@@ -72,6 +71,8 @@ class GameScreen : ScalingScreenAdapter() {
     //========================================================================
     //#region fields
     //========================================================================
+
+    var drawStage = true
 
     /**
      * <h2>Camera used to observe the world</h2>
@@ -133,10 +134,6 @@ class GameScreen : ScalingScreenAdapter() {
      * <h2>Constructs GUI shown within the game window</h2>
      */
     fun createUI() {
-        // Have the mouse handler accept this stage for receiving mouse input
-        MouseHandler.configureGameInput(stage)
-
-        // Add to stage
         with (stage) {
             addActor(Menu(this@GameScreen))
             addActor(StageWindow.getWINDOW_DOCK())
@@ -152,6 +149,8 @@ class GameScreen : ScalingScreenAdapter() {
      * <h2>Renders the next frame</h2>
      */
     override fun render(delta: Float) {
+        if (Hypervisor.isCinematingLocalTurn)
+            Hypervisor.turn_end_cinemate_update()
 
         // Render the world
         r!!.render()
@@ -171,7 +170,7 @@ class GameScreen : ScalingScreenAdapter() {
             )
         }
 
-        if (cm_isSelectingDestination || GameData.selectedUnit?.destination?.first != -1)
+        if (cm_isSelectingDestination || GameData.selectedUnit?.destination?.x != -1f)
             renderDestinationLine()
 
         var v = mouse_focusOnTile()
@@ -181,43 +180,46 @@ class GameScreen : ScalingScreenAdapter() {
         // Draw another in the center of the screen.
         sr.projectionMatrix = HUDBatch.projectionMatrix
         sr.circle(centerx, centery, 5f)
+
         sr.end()
+
         renderSprites()
 
+        // Lighting
+
+        GameData.world!!.rayHandler.setCombinedMatrix(cam.combined)
+        GameData.world!!.rayHandler.updateAndRender()
 
         // META : Draw FPS as 10x, 10y in the world
         //font.draw(worldBatch, "FPS : " + Gdx.graphics.getFramesPerSecond(), 10, 10);
 
+        if (drawStage) {
+            // Update the UI (listen for inputs, etc)
+            stage.act(delta)
 
-        // Update the UI (listen for inputs, etc)
-        stage.act(delta)
-
-        // Draw the UI
-        stage.draw()
+            // Draw the UI
+            stage.draw()
+        }
         Debug.update()
+        super.render(delta)
     }
 
     fun renderSprites() {
         worldBatch.begin()
 
-        // Render cities
-        GameData.player!!.cities.forEach(
-            Consumer {
-                    city: City -> city.draw(worldBatch)
-                    font.draw(worldBatch, city.name, city.cartesianPosition().x, city.cartesianPosition().y)
-                    font.draw(worldBatch, "Population : ${city.population}", city.cartesianPosition().x, city.cartesianPosition().y - 15)
-            }
-        )
-        GameData.player!!.units.forEach(
-            Consumer { sprite: Unit ->
-                // META : This draws a gl rect over the true area where sprites are rendered, so you can see where the sprites boundaries are.
-//                    if (Debug.enabled()) {
-//                        sr.begin(ShapeRenderer.ShapeType.Filled);
-//                        sr.rect(sprite.getBoundingRectangle().x,sprite.getBoundingRectangle().y,sprite.getBoundingRectangle().width,sprite.getBoundingRectangle().height);
-//                        sr.end();
-//                    }
+        GameData.nations.forEach {
+
+            it.units.forEach { sprite: Unit ->
                 sprite.draw(worldBatch)
-            })
+            }
+
+            it.settlements.forEach {
+                    city: Settlement -> city.draw(worldBatch)
+                font.draw(worldBatch, city.name, city.cartesianPosition().x, city.cartesianPosition().y)
+                font.draw(worldBatch, "Population : ${city.size}", city.cartesianPosition().x, city.cartesianPosition().y - 15)
+            }
+        }
+
         worldBatch.end()
     }
 
@@ -231,11 +233,11 @@ class GameScreen : ScalingScreenAdapter() {
             if (this != null) { // If there's a selected unit
 
                 // Cache the selected tile.
-                val sel = GameHypervisor.cm_selectedTile()
+                val sel = Hypervisor.cm_selectedTile()
 
                 // If we're selecting, calculate new destination.
                 if (cm_isSelectingDestination)
-                    setDestination(sel.x.toInt(), sel.y.toInt())
+                    setDestination(sel.x, sel.y)
 
 
 
@@ -308,7 +310,9 @@ class GameScreen : ScalingScreenAdapter() {
     }
 
     override fun show() {
+        super.show()
         sr.end()
+
     } //#endregion
 
     //========================================================================
@@ -323,7 +327,6 @@ class GameScreen : ScalingScreenAdapter() {
         newRenderer()
 
         //r.setView(camera.getCam());
-
 
         // Configure UI
         resize(Gdx.graphics.width, Gdx.graphics.height)

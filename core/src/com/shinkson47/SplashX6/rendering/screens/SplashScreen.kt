@@ -34,6 +34,8 @@ package com.shinkson47.SplashX6.rendering.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
@@ -48,21 +50,18 @@ import com.shinkson47.SplashX6.utility.PrebootAssets
  * @since v1
  * @version 1
  */
-class SplashScreen : CreditsScreen(
-        PrebootAssets.PB_SKIN.getFont("Vecna"),
-        PrebootAssets.SPLASH_TEXT.split("\n")
+class SplashScreen : TextScreen(
+    text = PrebootAssets.SPLASH_TEXT,
+    font = PrebootAssets.PB_SKIN.getFont("Serif"),
+    fontColor = Color.WHITE,
 ) {
 
     @Volatile private var currentFrame = 0f
+    private val bg = Animation(0.06f, PrebootAssets.splashBG.regions, Animation.PlayMode.LOOP)
 
     val progress = ProgressBar(0f, 1f, 0.0001f, false, PrebootAssets.PB_SKIN)
 
-    private val bg = Animation(0.06f, PrebootAssets.splashBG.regions, Animation.PlayMode.LOOP)
-
     init {
-        renderBG = false
-        font.setColor(1f,1f,1f,1f)
-
         stage.addActor(Container<ProgressBar>().also {
             it.actor = progress
             progress.setFillParent(true)
@@ -85,8 +84,10 @@ class SplashScreen : CreditsScreen(
         progress.value = Assets.progress
 
         super.render(delta)
-        if (Assets.update(delta.toInt()) && Client.client!!.currentScreen == this)
-            Client.client!!.fadeScreen(MainMenu())
+
+        // oncomplete work around. main menu cannot be before loading.
+        if (Assets.update(delta.toInt()) && Client.client.currentScreen == this)
+            Client.client.fadeScreen(MainMenu())
 
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
             Thread.sleep(1_000)

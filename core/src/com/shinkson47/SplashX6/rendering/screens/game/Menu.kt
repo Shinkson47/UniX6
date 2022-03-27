@@ -40,27 +40,28 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.gdx.musicevents.tool.file.FileChooser
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.ConnectGame
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.EndGame
-import com.shinkson47.SplashX6.game.cities.Production
+import com.shinkson47.SplashX6.game.Hypervisor
+import com.shinkson47.SplashX6.game.Hypervisor.ConnectGame
+import com.shinkson47.SplashX6.game.Hypervisor.endGame
+import com.shinkson47.SplashX6.game.production.UnitProductionProject
 import com.shinkson47.SplashX6.game.units.UnitClass
 import com.shinkson47.SplashX6.network.NetworkClient
 import com.shinkson47.SplashX6.network.Packet
 import com.shinkson47.SplashX6.network.PacketType
 import com.shinkson47.SplashX6.network.Server
-import com.shinkson47.SplashX6.rendering.StageWindow
-import com.shinkson47.SplashX6.rendering.windows.game.W_Advancement
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.rendering.windows.W_Options
 import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
-import com.shinkson47.SplashX6.rendering.windows.game.Music
-import com.shinkson47.SplashX6.rendering.windows.game.W_Settlements
-import com.shinkson47.SplashX6.rendering.windows.game.Spotify
-import com.shinkson47.SplashX6.rendering.windows.game.W_Help
+import com.shinkson47.SplashX6.rendering.windows.W_StateMachines
+import com.shinkson47.SplashX6.rendering.windows.game.*
+import com.shinkson47.SplashX6.rendering.windows.game.settlements.W_Settlements
 import com.shinkson47.SplashX6.rendering.windows.game.units.W_UnitsList
 import com.shinkson47.SplashX6.utility.Assets.REF_SKIN_W95
-import com.shinkson47.SplashX6.utility.Debug.DebugWindow
-import com.shinkson47.SplashX6.utility.Utility.*
+import com.shinkson47.SplashX6.utility.Utility.AssertEndsWith
+import com.shinkson47.SplashX6.utility.Utility.message
+import com.shinkson47.SplashX6.utility.Utility.warnDev
+import com.shinkson47.SplashX6.utility.configuration.LanguageConfig.local
+import com.shinkson47.SplashX6.utility.debug.Debug.DebugWindow
 
 /**
  * # The menu bar used in-game to access tools, windows and more.
@@ -103,7 +104,7 @@ class Menu(_parent : GameScreen) : Table(REF_SKIN_W95) {
 
         chooser.setResultListener { success, result ->
             if (success)
-                GameHypervisor.save(Gdx.files.external(AssertEndsWith(result.path(), ".X6")).file())
+                Hypervisor.save(Gdx.files.external(AssertEndsWith(result.path(), ".X6")).file())
             true
         }
 
@@ -118,22 +119,24 @@ class Menu(_parent : GameScreen) : Table(REF_SKIN_W95) {
 
         addMenuItem(this, "generic.game.game", NOTHING,
                 MenuSubItem("generic.any.options", WindowAction(W_Options(_parent))) ,
-                MenuSubItem("generic.game.new")         { GameHypervisor.NewGame() } ,
+                MenuSubItem("generic.game.new")         { Hypervisor.NewGame() } ,
                 //MenuSubItem("generic.game.load")           { GameHypervisor.load() } ,
-                MenuSubItem("generic.game.quickload")   { GameHypervisor.quickload() } ,
+                MenuSubItem("generic.game.quickload")   { Hypervisor.quickload() } ,
                 MenuSubItem("generic.game.save")        { chooser.show(stage) } ,
-                MenuSubItem("generic.game.quicksave")   { GameHypervisor.quicksave() } ,
-                MenuSubItem("!Rejoin")   { if (NetworkClient.isConnected()) { EndGame(); ConnectGame(); } } ,
-                MenuSubItem("generic.game.end")         { EndGame() }
+                MenuSubItem("generic.game.quicksave")   { Hypervisor.quicksave() } ,
+                MenuSubItem("!Rejoin")   { if (NetworkClient.isConnected()) { endGame(); ConnectGame(); } } ,
+                MenuSubItem("generic.game.end")         { endGame() }
         )
 
         addMenuItem(this, "!Help", WindowAction(W_Help()),
-            MenuSubItem("!Toggle Key Binding HUD.") { GameHypervisor.gameRenderer!!.kbr.apply { isVisible = !isVisible }}
+            MenuSubItem("!Toggle Key Binding HUD.") { Hypervisor.gameRenderer!!.kbr.apply { isVisible = !isVisible }}
         )
 
         addMenuItem(this, "!Debug", WindowAction(DebugWindow()),
-                MenuSubItem("!Tech Test", WindowAction(W_Advancement())),
+            MenuSubItem("!Techs", WindowAction(W_AdvancementProduction())),
+
                 MenuSubItem("!Defog All") { GameData.world!!.removeFogOfWar() },
+                MenuSubItem("!Manage State Machines", WindowAction(W_StateMachines())),
                 MenuSubItem("!Hard reset server") { Server.shutdown(); Server.boot() },
                 MenuSubItem("!Reload Help Text") { W_Help.reload() },
                 MenuSubItem("!World Generation", WindowAction(TerrainGenerationEditor())),
@@ -142,9 +145,9 @@ class Menu(_parent : GameScreen) : Table(REF_SKIN_W95) {
                 MenuSubItem("!Notify Start") {Server.sendToAllClients(Packet(PacketType.Start, GameData))},
                 MenuSubItem("!Show a message") { message("Everything is fine :)")},
                 MenuSubItem("!Show an error") { warnDev("Everything is broken :(")},
-            MenuSubItem("!Reload UI") { GameHypervisor.gameRenderer!!.let { it.stage.clear(); it.createUI() }  },
+            MenuSubItem("!Reload UI") { Hypervisor.gameRenderer!!.let { it.stage.clear(); it.createUI() }  },
 
-                MenuSubItem("!Add a production project") { GameData.player!!.cities[0].production.queue(Production.UnitProductionProject(UnitClass.chariot)) }
+                MenuSubItem("!Add a production project") { GameData.player!!.settlements[0].unitProduction.queueProject(UnitProductionProject(UnitClass.chariot)) }
         )
 
 
@@ -158,17 +161,12 @@ class Menu(_parent : GameScreen) : Table(REF_SKIN_W95) {
 
         addMenuItem(
             this, "!Manage", NOTHING,
-            //MenuSubItem("!War room view") { cm_toggle() },
-            MenuSubItem("generic.game.settlements") { W_Settlements() },
-            MenuSubItem("generic.game.units") { W_UnitsList() },
-            //MenuSubItem("!") { W_Settlements() },
-//            MenuSubItem("specific.windows.units.view") { GameHypervisor.unit_view() },
-//            MenuSubItem("specific.windows.units.viewDestination") { GameHypervisor.unit_viewDestination() },
-//            MenuSubItem("specific.windows.units.setDestination") { GameHypervisor.unit_setDestination() },
-//            MenuSubItem("specific.windows.units.disband") { GameHypervisor.unit_disband() },
+            MenuSubItem("generic.game.settlements", WindowAction(W_Settlements())),
+            MenuSubItem("generic.game.units", WindowAction(W_UnitsList())),
+            MenuSubItem("!Advancements", WindowAction(W_Advancement("!Advancements"))),
         )
 
-        addMenuItem(this, "generic.game.endTurn", { GameHypervisor.turn_end() })
+        addMenuItem(this, "generic.game.endTurn", { Hypervisor.turn_end() })
     }
 
 

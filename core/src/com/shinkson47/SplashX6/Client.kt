@@ -37,15 +37,16 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.shinkson47.SplashX6.audio.AudioController
-import com.shinkson47.SplashX6.game.GameHypervisor
+import com.shinkson47.SplashX6.game.Hypervisor
 import com.shinkson47.SplashX6.input.KeyBinder
 import com.shinkson47.SplashX6.input.mouse.MouseHandler
 import com.shinkson47.SplashX6.rendering.screens.ScreenTransistion
 import com.shinkson47.SplashX6.rendering.screens.SplashScreen
 import com.shinkson47.SplashX6.rendering.screens.WorldCreation
 import com.shinkson47.SplashX6.utility.Assets
-import com.shinkson47.SplashX6.utility.Debug
-import com.shinkson47.SplashX6.utility.GraphicalConfig
+import com.shinkson47.SplashX6.utility.Utility
+import com.shinkson47.SplashX6.utility.debug.Debug
+import com.shinkson47.SplashX6.utility.configuration.GraphicalConfig
 import java.awt.Image
 import javax.imageio.ImageIO
 
@@ -111,9 +112,13 @@ class Client : Game() {
      */
     override fun render() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        currentScreen?.render(Gdx.graphics.deltaTime)
-        KeyBinder.poll()
-        MouseHandler.Poll()
+        try {
+            currentScreen?.render(Gdx.graphics.deltaTime)
+            KeyBinder.poll()
+            MouseHandler.Poll()
+        } catch (e : Throwable) {
+            Utility.fatal("How very pre-alpha of me.", e)
+        }
     }
 
     /**
@@ -122,9 +127,7 @@ class Client : Game() {
      */
     override fun dispose() {
         super.dispose()
-        GameHypervisor.dispose()
-        //World.dispose()
-        //AudioManager.dispose();
+        Hypervisor.dispose()
         Debug.dispose()
         Assets.dispose()
     }
@@ -169,7 +172,6 @@ class Client : Game() {
         @JvmField
         var CI_CD_FS: Boolean = false
 
-        @JvmField
-        var client: Client? = null
+        lateinit var client: Client
     }
 }

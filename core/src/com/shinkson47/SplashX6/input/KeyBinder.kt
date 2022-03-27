@@ -3,24 +3,23 @@ package com.shinkson47.SplashX6.input
 import com.badlogic.gdx.*
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.EndGame
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.NewGame
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.cm_enter
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.cm_exit
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.cm_toggle
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.turn_end
-import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.game.Hypervisor
+import com.shinkson47.SplashX6.game.Hypervisor.endGame
+import com.shinkson47.SplashX6.game.Hypervisor.NewGame
+import com.shinkson47.SplashX6.game.Hypervisor.cm_enter
+import com.shinkson47.SplashX6.game.Hypervisor.cm_exit
+import com.shinkson47.SplashX6.game.Hypervisor.cm_toggle
+import com.shinkson47.SplashX6.game.Hypervisor.turn_end
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.rendering.screens.Warroom
 import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
 import com.shinkson47.SplashX6.rendering.screens.MainMenu
-import com.shinkson47.SplashX6.rendering.windows.TerrainGenerationEditor
 import com.shinkson47.SplashX6.rendering.windows.game.units.W_Unit
 import com.shinkson47.SplashX6.utility.APICondition.Companion.MSG_TRIED_EXCEPT
 import com.shinkson47.SplashX6.utility.APICondition.Companion.REQ_IN_GAME
 import com.shinkson47.SplashX6.utility.APICondition.Companion.THROW
 import com.shinkson47.SplashX6.utility.APICondition.Companion.validateCall
-import com.shinkson47.SplashX6.utility.GraphicalConfig
+import com.shinkson47.SplashX6.utility.configuration.GraphicalConfig
 
 /**
  * # Binds key presses to runnable actions.
@@ -83,7 +82,7 @@ object KeyBinder : InputAdapter() {
         // ========================================
 
         with (GameScreen::class.java) {
-            bind(this, Input.Keys.ESCAPE) { EndGame() }
+            bind(this, Input.Keys.ESCAPE) { endGame() }
 
             // Function keys.
             bind(this, Input.Keys.F1) { cm_enter() }
@@ -103,16 +102,16 @@ object KeyBinder : InputAdapter() {
 //            bind(this, Input.Keys.NUM_0) { select(9) }
 
             if (Client.DEBUG_MODE) {
-                bind(this, Input.Keys.NUMPAD_ADD, true) { GameHypervisor.gameRenderer?.cam!!.desiredPosition.desired.z += 30; }
-                bind(this, Input.Keys.NUMPAD_SUBTRACT, true) { GameHypervisor.gameRenderer?.cam!!.desiredPosition.desired.z -+ 30; }
+                bind(this, Input.Keys.NUMPAD_ADD, true) { Hypervisor.gameRenderer?.cam!!.desiredPosition.desired.z += 30; }
+                bind(this, Input.Keys.NUMPAD_SUBTRACT, true) { Hypervisor.gameRenderer?.cam!!.desiredPosition.desired.z -+ 30; }
             }
 
             bind(this, Input.Keys.E) { turn_end() }
             bind(this, Input.Keys.TAB) { cm_toggle() }
 
             bind(this, Input.Keys.SHIFT_LEFT,
-                Release = { GameHypervisor.gameRenderer?.cam!!.boost(false) },
-                Action =  { GameHypervisor.gameRenderer?.cam!!.boost(true) })
+                Release = { Hypervisor.gameRenderer?.cam!!.boost(false) },
+                Action =  { Hypervisor.gameRenderer?.cam!!.boost(true) })
         }
 
         // ========================================
@@ -145,7 +144,7 @@ object KeyBinder : InputAdapter() {
 
         with (GameScreen::class.java) {
             // Camera control
-            val camera = GameHypervisor.gameRenderer!!.cam
+            val camera = Hypervisor.gameRenderer!!.cam
             bind(this, Input.Keys.W, true) { camera.up() }
             bind(this, Input.Keys.S, true) { camera.down() }
             bind(this, Input.Keys.D, true) { camera.right() }
@@ -155,19 +154,19 @@ object KeyBinder : InputAdapter() {
             bind(this, Input.Keys.RIGHT, true) { camera.right() }
             bind(this, Input.Keys.LEFT, true) { camera.left() }
 
-            bind(this, Input.Keys.C, false) { GameHypervisor.unit_view() }
+            bind(this, Input.Keys.C, false) { Hypervisor.unit_view() }
             bind(this, Input.Keys.X, false) { GameData.selectedUnit?.let { StageWindow.post(W_Unit(it)) } }
             bind(this, Input.Keys.GRAVE, false) { StageWindow.unPostAll() }
-            bind(this, Input.Keys.SPACE, false) { GameHypervisor.cm_destinationSelect() }
+            bind(this, Input.Keys.SPACE, false) { Hypervisor.cm_destinationSelect() }
         }
 
         with (Warroom::class.java) {
             // Camera control
-            bind(this, Input.Keys.W, true) { GameHypervisor.gameRenderer!!.managementScreen.up() }
-            bind(this, Input.Keys.S, true) { GameHypervisor.gameRenderer!!.managementScreen.down() }
-            bind(this, Input.Keys.D, true) { GameHypervisor.gameRenderer!!.managementScreen.right() }
-            bind(this, Input.Keys.A, true) { GameHypervisor.gameRenderer!!.managementScreen.left() }
-            bind(this, Input.Keys.C, false) { GameHypervisor.unit_view() }
+            bind(this, Input.Keys.W, true) { Hypervisor.gameRenderer!!.managementScreen.up() }
+            bind(this, Input.Keys.S, true) { Hypervisor.gameRenderer!!.managementScreen.down() }
+            bind(this, Input.Keys.D, true) { Hypervisor.gameRenderer!!.managementScreen.right() }
+            bind(this, Input.Keys.A, true) { Hypervisor.gameRenderer!!.managementScreen.left() }
+            bind(this, Input.Keys.C, false) { Hypervisor.unit_view() }
         }
 
 

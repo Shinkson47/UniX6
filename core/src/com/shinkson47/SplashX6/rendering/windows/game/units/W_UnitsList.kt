@@ -34,10 +34,11 @@ package com.shinkson47.SplashX6.rendering.windows.game.units
 
 import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
+import com.shinkson47.SplashX6.game.Hypervisor
 import com.shinkson47.SplashX6.game.units.Unit
-import com.shinkson47.SplashX6.rendering.StageWindow
+import com.shinkson47.SplashX6.rendering.ui.StageWindow
 import com.shinkson47.SplashX6.utility.Assets
+import com.shinkson47.SplashX6.utility.Utility.CollectionToGDXArray
 
 /**
  * # Displays a list of all units in a civilisation.
@@ -57,7 +58,7 @@ class W_UnitsList : StageWindow("generic.game.units"){
         val selected = list.selected
 
         selected?.let {
-            GameHypervisor.unit_select(it)
+            Hypervisor.unit_select(it)
         }
 
         if (it.tapCount >= 2)
@@ -77,7 +78,8 @@ class W_UnitsList : StageWindow("generic.game.units"){
     }
 
     override fun refresh() {
-        list.setItems(*GameData.player!!.units.toTypedArray())
+        // TODO i hate this
+        list.setItems(CollectionToGDXArray(GameData.player!!.units.items.filterNotNull()))
         pack()
     }
 

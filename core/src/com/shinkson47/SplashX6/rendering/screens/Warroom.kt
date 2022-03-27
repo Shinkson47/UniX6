@@ -37,13 +37,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
 import com.shinkson47.SplashX6.Client
-import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.camera_focusOn
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.unit_selected
-import com.shinkson47.SplashX6.game.GameHypervisor.Companion.unit_view
+import com.shinkson47.SplashX6.game.GameData
+import com.shinkson47.SplashX6.game.Hypervisor
 import com.shinkson47.SplashX6.game.world.WorldTerrain
 import com.shinkson47.SplashX6.rendering.Camera
 import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
+import com.shinkson47.SplashX6.utility.debug.Console
 import com.shinkson47.SplashX6.utility.lerpDesire
 
 /**
@@ -69,10 +68,10 @@ class Warroom(val parent : GameScreen) : ScreenAdapter() {
         if (Client.client!!.currentScreen == this) return
         // Set orthographic view with current viewport state.
         camera.setToOrtho(false,parent.cam.viewportWidth,parent.cam.viewportHeight)
-
+        GameData.world!!.rayHandler.setCombinedMatrix(camera)
         // In case we swap screens mid-frame. Sometimes the semaphore was left open.
         parent.sr.end()
-        updateView()
+        updateView()    
     }
 
     override fun render(delta: Float) {
@@ -97,6 +96,10 @@ class Warroom(val parent : GameScreen) : ScreenAdapter() {
 
             sr.end()
         }
+
+        // TODO lighting doesn't render correctly on either of the matricies.
+        //GameData.world!!.rayHandler.updateAndRender()
+        Console.draw()
     }
 
 
@@ -104,7 +107,7 @@ class Warroom(val parent : GameScreen) : ScreenAdapter() {
      * # Renders a circle on the tile the cursor is pointing to.
      */
     private fun renderMouseCircle() {
-        val iso = GameHypervisor.cm_selectedTile()
+        val iso = Hypervisor.cm_selectedTile()
         val isocart = WorldTerrain.isoToCartesian(iso.x.toInt(), iso.y.toInt())
         parent.sr.circle(isocart.x, isocart.y, 10f)
     }

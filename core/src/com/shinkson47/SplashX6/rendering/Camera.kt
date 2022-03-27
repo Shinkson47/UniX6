@@ -33,17 +33,16 @@
 package com.shinkson47.SplashX6.rendering
 
 import com.badlogic.gdx.Preferences
-import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import com.shinkson47.SplashX6.game.GameData
-import com.shinkson47.SplashX6.game.GameHypervisor
-import com.shinkson47.SplashX6.utility.Debug
+import com.shinkson47.SplashX6.game.Hypervisor
+import com.shinkson47.SplashX6.utility.debug.Debug
 import com.shinkson47.SplashX6.utility.lerpDesire
 import com.shinkson47.SplashX6.game.world.WorldTerrain
 import com.shinkson47.SplashX6.utility.Assets
-import com.shinkson47.SplashX6.utility.GraphicalConfig
+import com.shinkson47.SplashX6.utility.configuration.GraphicalConfig
 import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.tan
@@ -161,7 +160,7 @@ class Camera: PerspectiveCamera() {
     /**
      * # Desired degrees of fov
      */
-    val desiredZoom: lerpDesire<Float> = lerpDesire(ZOOM_MINIMUM, zoomSpeed)
+    val desiredZoom: lerpDesire<Float> = lerpDesire(ZOOM_MAXIMUM, zoomSpeed)
 
 
 
@@ -280,13 +279,14 @@ class Camera: PerspectiveCamera() {
      * # Moves the camera from it's current position to the [desiredPosition].
      */
     private fun updateMove(){
+        if(!enableMove) return
         // TODO these two lines shouldn't happen every frame, they're pretty heavy
 
 
         // (badly) Change viewport to match field of view
         // this can't really be improved, the staggared isometric renderer does not support a perspective camera, or it's culling frustum.
         // TODO As a work-around we could add a user adjustable varable to the width
-        GameHypervisor.gameRenderer!!.r!!.setView(combined,position.x - cachedFrustrumStartX ,position.y,  cachedFrustrumWidth, viewportHeight * fieldOfView)
+        Hypervisor.gameRenderer!!.r!!.setView(combined,position.x - cachedFrustrumStartX ,position.y,  cachedFrustrumWidth, viewportHeight * fieldOfView)
 
         // Move towards desired position
         desiredPosition.next();
@@ -366,6 +366,10 @@ class Camera: PerspectiveCamera() {
         desiredPosition.desired.x += TRUE_SPEED
     }
 
+    var enableMove = true
+    fun toggleMovement() {
+        enableMove = !enableMove
+    }
 
 
     // ============================================================
