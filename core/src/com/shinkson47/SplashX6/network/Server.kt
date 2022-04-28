@@ -32,6 +32,7 @@
 
 package com.shinkson47.SplashX6.network
 
+import com.badlogic.gdx.physics.bullet.collision._btMprSimplex_t
 import com.shinkson47.SplashX6.Client
 import com.shinkson47.SplashX6.game.GameData
 import com.shinkson47.SplashX6.rendering.screens.game.GameScreen
@@ -75,6 +76,9 @@ object Server {
         var dirty : Boolean = false
         var running : Boolean = true
 
+        private val packetQueue = ArrayList<Packet>()
+
+
         fun isConnected() = this::_clientSocket.isInitialized && _clientSocket.isConnected
 
 
@@ -87,6 +91,15 @@ object Server {
             onClientConnect()
             status()
             newSocketThread()
+
+            while (!Thread.currentThread().isInterrupted){
+                if (packetQueue.isNotEmpty()) {
+                    packetQueue.apply {
+                        forEach { implSend(it) }
+                        packetQueue.clear()
+                    }
+                }
+            }
         }
 
         fun stop() {
@@ -104,7 +117,12 @@ object Server {
                 send(Packet(PacketType.Status, GameData))
         }
 
+        @Synchronized
         fun send(packet: Packet) {
+            packetQueue.add(packet)
+        }
+
+        private fun implSend(packet: Packet) {
             if (isConnected()) {
                 while (true) {
                     Packet.send(packet, _clientInput, _clientOutput)
